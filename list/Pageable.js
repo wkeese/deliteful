@@ -1,4 +1,5 @@
 define(["dcl/dcl",
+		"delite/handlebars",
 		"delite/register",
 		"dojo/on",
 		"dojo/string",
@@ -10,9 +11,10 @@ define(["dcl/dcl",
 		"delite/Widget",
 		"./Renderer",
 		"../ProgressIndicator",
-		"requirejs-dplugins/i18n!./List/nls/Pageable"
-], function (dcl, register, on, string, when, Deferred, dom, domClass, has,
-		Widget, Renderer, ProgressIndicator, messages) {
+		"requirejs-dplugins/i18n!./List/nls/Pageable",
+		"requirejs-text/text!./List/PageableList.html"
+], function (dcl, handlebars, register, on, string, when, Deferred, dom, domClass, has,
+		Widget, Renderer, ProgressIndicator, messages, template) {
 
 	// module:
 	//		deliteful/list/Pageable
@@ -50,7 +52,7 @@ define(["dcl/dcl",
 					this._button.removeAttribute("aria-disabled");
 				}
 			}
-			// always execute afterLoading, event if the page loader widget was destroyed
+			// always execute afterLoading, even if the page loader widget was destroyed
 			if (!loading) {
 				this.afterLoading();
 			}
@@ -277,6 +279,9 @@ define(["dcl/dcl",
 			});
 		},
 
+
+		buildRendering: handlebars.compile(template),
+
 		//////////// delite/Store methods ///////////////////////////////////////
 
 		refreshProperties: dcl.superCall(function (sup) {
@@ -442,8 +447,8 @@ define(["dcl/dcl",
 				for (i = 0; i < idPage.length; i++) {
 					this._removeRenderer(this.getItemRendererByIndex(0), true);
 				}
-				if (idPage.length && !this._previousPageLoader) {
-					this._createPreviousPageLoader();
+				if (idPage.length) {
+					this._enablePreviousPageLoader();
 				}
 				// if the next page is also empty, unload it too
 				if (this._idPages.length && !this._idPages[0].length) {
@@ -455,8 +460,8 @@ define(["dcl/dcl",
 				for (i = 0; i < idPage.length; i++) {
 					this._removeRenderer(this.getRendererByItemId(idPage[i]), true);
 				}
-				if (idPage.length && !this._nextPageLoader) {
-					this._createNextPageLoader();
+				if (idPage.length) {
+					this._enableNextPageLoader();
 				}
 				// if the previous page is also empty, unload it too
 				if (this._idPages.length && !this._idPages[this._idPages.length - 1].length) {
@@ -483,10 +488,7 @@ define(["dcl/dcl",
 			}
 			if (this._firstLoaded === 0) {
 				// no more previous page
-				this._previousPageLoader.destroy();
-				this._previousPageLoader = null;
-			} else {
-				this._previousPageLoader.placeAt(this.containerNode, "first");
+				this._disablePreviousPageLoader();
 			}
 			// the renderer may have been destroyed and replaced by another one (categorized lists)
 			if (renderer._destroyed) {
@@ -524,18 +526,11 @@ define(["dcl/dcl",
 			if (this.maxPages && this._idPages.length > this.maxPages) {
 				this._unloadPage(true);
 			}
-			if (this._nextPageLoader) {
-				if (items.length !== this._rangeSpec.count) {
-					// no more next page
-					this._nextPageLoader.destroy();
-					this._nextPageLoader = null;
-				} else {
-					this._nextPageLoader.placeAt(this.containerNode);
-				}
+			if (items.length === this._rangeSpec.count) {
+				this._enableNextPageLoader();
 			} else {
-				if (items.length === this._rangeSpec.count) {
-					this._createNextPageLoader();
-				}
+				// no more next page
+				this._disableNextPageLoader();
 			}
 			if (renderer) {
 				var next = renderer.nextElementSibling;
@@ -602,11 +597,10 @@ define(["dcl/dcl",
 
 		//////////// Page loaders creation ///////////////////////////////////////
 
-		_createNextPageLoader: function () {
+		_enableNextPageLoader: function () {
 			// summary:
-			//		create the next page loader widget
+			//		show the next page loader widget
 			/* jshint newcap: false*/
-			this._nextPageLoader = new _PageLoaderRenderer();
 			this._nextPageLoader.item = {
 				loadMessage: string.substitute(this.loadNextMessage, this),
 				loadingMessage: this.loadingMessage
@@ -622,15 +616,16 @@ define(["dcl/dcl",
 				return this._loadNextPage();
 			}.bind(this);
 			this._nextPageLoader._list = this;
-			this._nextPageLoader.placeAt(this.containerNode);
-			this._nextPageLoader.startup();
+			this._nextPageLoader.style.display = "";
+		},
+		_disableNextPageLoader: function () {
+			this._nextPageLoader.style.display = "none";
 		},
 
-		_createPreviousPageLoader: function () {
+		_enablePreviousPageLoader: function () {
 			// summary:
-			//		create the previous page loader widget
+			//		show the previous page loader widget
 			/* jshint newcap: false*/
-			this._previousPageLoader = new _PageLoaderRenderer();
 			this._previousPageLoader.item = {
 				loadMessage: string.substitute(this.loadPreviousMessage, this),
 				loadingMessage: this.loadingMessage
@@ -646,8 +641,10 @@ define(["dcl/dcl",
 				return this._loadPreviousPage();
 			}.bind(this);
 			this._previousPageLoader._list = this;
-			this._previousPageLoader.placeAt(this.containerNode, "first");
-			this._previousPageLoader.startup();
+			this._previousPageLoader.style.display = "";
+		},
+		_disablePreviousPageLoader: function () {
+			this._previousPageLoader.style.display = "none";
 		},
 
 		//////////// List methods overriding ///////////////////////////////////////
@@ -673,13 +670,9 @@ define(["dcl/dcl",
 				} else if (index <= this._firstLoaded) {
 					this._firstLoaded++;
 					this._lastLoaded++;
-					if (!this._previousPageLoader) {
-						this._createPreviousPageLoader();
-					}
+					this._enablePreviousPageLoader();
 				} else if (index > this._lastLoaded) {
-					if (!this._nextPageLoader) {
-						this._createNextPageLoader();
-					}
+					this._enableNextPageLoader();
 				}
 			};
 		}),

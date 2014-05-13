@@ -1,0 +1,8 @@
+<template role="grid" aria-readonly="true">
+	<d-list-loading-panel message="{{loadingMessage}}" data-attach-point="_loadingPanel"></d-list-loading-panel>
+	<div data-attach-point="scrollableNode">
+		<d-list-loader data-attach-point="_previousPageLoader" style="display: none"></d-list-loader>
+		<div data-attach-point="containerNode" class="d-list-container"></div>
+		<d-list-loader data-attach-point="_nextPageLoader" style="display: none"></d-list-loader>
+	</div>
+</template>

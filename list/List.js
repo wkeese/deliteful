@@ -4,7 +4,6 @@ define(["dcl/dcl",
 	"dojo/_base/lang",
 	"dojo/when",
 	"dojo/dom-class",
-	"dojo/dom-construct",
 	"dojo/keys",
 	"delite/CustomElement",
 	"delite/Selection",
@@ -12,14 +11,16 @@ define(["dcl/dcl",
 	"delite/StoreMap",
 	"delite/Invalidating",
 	"delite/Scrollable",
+	"delite/handlebars",
 	"./ItemRenderer",
 	"./CategoryRenderer",
 	"./_DefaultStore",
-	"./_LoadingPanel",
+	"requirejs-text/text!./List/List.html",
+	"./_LoadingPanel",	// used by template
 	"delite/theme!./List/themes/{{theme}}/List_css",
 	"dojo/has!dojo-bidi?delite/theme!./List/themes/{{theme}}/List_rtl_css"
-], function (dcl, register, on, lang, when, domClass, domConstruct, keys, CustomElement, Selection, KeyNav, StoreMap,
-		Invalidating, Scrollable, ItemRenderer, CategoryRenderer, DefaultStore, LoadingPanel) {
+], function (dcl, register, on, lang, when, domClass, keys, CustomElement, Selection, KeyNav, StoreMap,
+		Invalidating, Scrollable, handlebars, ItemRenderer, CategoryRenderer, DefaultStore, template) {
 
 	// module:
 	//		deliteful/list/List
@@ -171,25 +172,7 @@ define(["dcl/dcl",
 			}
 		},
 
-		buildRendering: function () {
-			// summary:
-			//		Initialize the widget node and set the container and scrollable node.
-			// tags:
-			//		protected
-
-			this.containerNode = this.scrollableNode = this.ownerDocument.createElement("div");
-			// Firefox focus the scrollable node when clicking it or tabing: in this case, the list
-			// widget needs to be focused instead.
-			this.own(on(this.scrollableNode, "focus", function () {
-				this.focus();
-			}.bind(this)));
-			this.containerNode.className = "d-list-container";
-			this.appendChild(this.containerNode);
-			// Aria attributes
-			this.setAttribute("role", "grid");
-			// Might be overriden at the gridcell (renderer) level when developing custom renderers
-			this.setAttribute("aria-readonly", "true");
-		},
+		buildRendering: handlebars.compile(template),
 
 		postCreate: function () {
 			// summary:
@@ -448,21 +431,14 @@ define(["dcl/dcl",
 		_showLoadingPanel: function () {
 			// summary:
 			//		show the loading panel
-			if (!this._loadingPanel) {
-				// TODO: move this code into List template? (downside: _loadingPanel sometimes created unnecessarily)
-				this._loadingPanel = new LoadingPanel({message: this.loadingMessage});
-				domConstruct.place(this._loadingPanel, this, "first");
-				this._loadingPanel.startup();
-			}
+			this._loadingPanel.style.display = "";
 		},
 
 		_hideLoadingPanel: function () {
 			// summary:
 			//		hide the loading panel
-			if (this._loadingPanel) {
-				this._loadingPanel.destroy();
-				this._loadingPanel = null;
-			}
+			this._loadingPanel.style.display = "none";
+
 		},
 
 		_isCategorized: function () {
