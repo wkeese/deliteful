@@ -4,6 +4,7 @@ define(["dcl/dcl",
 	"dojo/_base/lang",
 	"dojo/when",
 	"dojo/dom-class",
+	"dojo/dom-construct",
 	"dojo/keys",
 	"delite/CustomElement",
 	"delite/Selection",
@@ -17,7 +18,7 @@ define(["dcl/dcl",
 	"./_LoadingPanel",
 	"delite/theme!./List/themes/{{theme}}/List_css",
 	"dojo/has!dojo-bidi?delite/theme!./List/themes/{{theme}}/List_rtl_css"
-], function (dcl, register, on, lang, when, domClass, keys, CustomElement, Selection, KeyNav, StoreMap,
+], function (dcl, register, on, lang, when, domClass, domConstruct, keys, CustomElement, Selection, KeyNav, StoreMap,
 		Invalidating, Scrollable, ItemRenderer, CategoryRenderer, DefaultStore, LoadingPanel) {
 
 	// module:
@@ -163,6 +164,11 @@ define(["dcl/dcl",
 				"selectionMode": "invalidateProperty",
 				"selectionMarkBefore": "invalidateProperty"
 			});
+
+			var dataNode = this.querySelector("d-list-store");
+			if (dataNode) {
+				this._inlineData = JSON.parse("[" + dataNode.textContent + "]");
+			}
 		},
 
 		buildRendering: function () {
@@ -170,6 +176,7 @@ define(["dcl/dcl",
 			//		Initialize the widget node and set the container and scrollable node.
 			// tags:
 			//		protected
+
 			this.containerNode = this.scrollableNode = this.ownerDocument.createElement("div");
 			// Firefox focus the scrollable node when clicking it or tabing: in this case, the list
 			// widget needs to be focused instead.
@@ -189,43 +196,21 @@ define(["dcl/dcl",
 			//		Assign a default store to the list.
 			// tags:
 			//		protected
-			this.store = new DefaultStore(this);
 			this._keyNavCodes[keys.PAGE_UP] = this._keyNavCodes[keys.HOME];
 			this._keyNavCodes[keys.PAGE_DOWN] = this._keyNavCodes[keys.END];
 			delete this._keyNavCodes[keys.HOME];
 			delete this._keyNavCodes[keys.END];
-		},
 
-		startup: dcl.superCall(function (sup) {
-			// summary:
-			//		Starts the widget: parse the content of the widget node to clean it,
-			//		add items to the store if specified in markup.
-			//		Using superCall() rather than the default chaining so that the code runs
-			//		before StoreMap.startup()
-			return function () {
-				// search for custom elements to populate the store
-				this._setBusy(true, true);
-				var children = Array.prototype.slice.call(this.children);
-				if (children.length) {
-					for (var i = 0; i < children.length; i++) {
-						var child = children[i];
-						if (child.tagName === "D-LIST-STORE") {
-							var data = JSON.parse("[" + child.textContent + "]");
-							for (var j = 0; j < data.length; j++) {
-								this.store.add(data[j]);
-							}
-						}
-						if (child !== this.containerNode && child !== this._loadingPanel) {
-							child.destroy();
-						}
-					}
-				}
-				this.on("query-error", function () { this._setBusy(false, true); }.bind(this));
-				if (sup) {
-					sup.call(this, arguments);
-				}
-			};
-		}),
+			this._setBusy(true, true);
+			this.on("query-error", function () { this._setBusy(false, true); }.bind(this));
+
+			this.store = new DefaultStore(this);
+			if (this._inlineData) {
+				this._inlineData.forEach(function (item) {
+					this.store.add(item);
+				}, this);
+			}
+		},
 
 		refreshRendering: dcl.superCall(function (sup) {
 			// summary:
@@ -464,8 +449,9 @@ define(["dcl/dcl",
 			// summary:
 			//		show the loading panel
 			if (!this._loadingPanel) {
+				// TODO: move this code into List template? (downside: _loadingPanel sometimes created unnecessarily)
 				this._loadingPanel = new LoadingPanel({message: this.loadingMessage});
-				this.insertBefore(this._loadingPanel, this.containerNode);
+				domConstruct.place(this._loadingPanel, this, "first");
 				this._loadingPanel.startup();
 			}
 		},
