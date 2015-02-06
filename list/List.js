@@ -11,11 +11,11 @@ define([
 	"delite/Scrollable",
 	"./ItemRenderer",
 	"./CategoryRenderer",
-	"./_LoadingPanel",
+	"delite/handlebars!./List/List.html",
 	"delite/theme!./List/themes/{{theme}}/List.css",
 	"requirejs-dplugins/has!bidi?delite/theme!./List/themes/{{theme}}/List_rtl.css"
 ], function (dcl, register, $, keys, CustomElement,
-		Selection, KeyNav, StoreMap, Scrollable, ItemRenderer, CategoryRenderer, LoadingPanel) {
+		Selection, KeyNav, StoreMap, Scrollable, ItemRenderer, CategoryRenderer, template) {
 
 	/**
 	 * A widget that renders a scrollable list of items.
@@ -225,17 +225,7 @@ define([
 		 * @private
 		 */
 
-		render: function () {
-			// Aria attributes
-			var currentRole = this.getAttribute("role");
-			if (currentRole) {
-				this._applyRole(currentRole);
-			} else {
-				this.setAttribute("role", "grid");
-			}
-			// Might be overriden at the cell (renderer renderNode) level when developing custom renderers
-			this.setAttribute("aria-readonly", "true");
-		},
+		template: template,
 
 		postRender: function () {
 			this.notifyCurrentValue("selectionMode");
@@ -539,15 +529,7 @@ define([
 		 * @private
 		 */
 		_showLoadingPanel: function () {
-			if (!this._loadingPanel) {
-				this._loadingPanel = new LoadingPanel({message: this.loadingMessage});
-				if (this.children[0] !== undefined) {
-					this.insertBefore(this._loadingPanel, this.children[0]);
-				} else {
-					this.appendChild(this._loadingPanel);
-				}
-				this._loadingPanel.attachedCallback();
-			}
+			this._loadingPanel.style.display = "";
 		},
 
 		/**
@@ -555,10 +537,7 @@ define([
 		 * @private
 		 */
 		_hideLoadingPanel: function () {
-			if (this._loadingPanel) {
-				this._loadingPanel.destroy();
-				this._loadingPanel = null;
-			}
+			this._loadingPanel.style.display = "none";
 		},
 
 		/**

@@ -7,10 +7,9 @@ define([
 	"requirejs-dplugins/jquery!attributes/classes",
 	"decor/sniff",
 	"./List",
-	"./Renderer",
-	"./PageLoaderRenderer",
+	"delite/handlebars!./List/PageableList.html",
 	"requirejs-dplugins/i18n!./List/nls/Pageable"
-], function (dcl, register, string, Promise, $, has, List, Renderer, PageLoadRenderer, messages) {
+], function (dcl, register, string, Promise, $, has, List, template, messages) {
 
 	/**
 	 * A widget that renders a scrollable list of items and provides paging.
@@ -152,6 +151,8 @@ define([
 		 * @private
 		 */
 		_lastLoaded: -1,
+
+		template: template,
 
 		//////////// delite/Store methods ///////////////////////////////////////
 
@@ -310,8 +311,8 @@ define([
 				for (i = 0; i < idPage.length; i++) {
 					this._removeRenderer(this.getItemRendererByIndex(0), true);
 				}
-				if (idPage.length && !this._previousPageLoader) {
-					this._createPreviousPageLoader();
+				if (idPage.length) {
+					this._enablePreviousPageLoader();
 				}
 				// if the next page is also empty, unload it too
 				if (this._idPages.length && !this._idPages[0].length) {
@@ -323,8 +324,8 @@ define([
 				for (i = 0; i < idPage.length; i++) {
 					this._removeRenderer(this.getRendererByItemId(idPage[i]), true);
 				}
-				if (idPage.length && !this._nextPageLoader) {
-					this._createNextPageLoader();
+				if (idPage.length) {
+					this._enableNextPageLoader();
 				}
 				// if the previous page is also empty, unload it too
 				if (this._idPages.length && !this._idPages[this._idPages.length - 1].length) {
@@ -352,10 +353,7 @@ define([
 			}
 			if (this._firstLoaded === 0) {
 				// no more previous page
-				this._previousPageLoader.destroy();
-				this._previousPageLoader = null;
-			} else {
-				this._previousPageLoader.placeAt(this, "first");
+				this._disablePreviousPageLoader();
 			}
 			// the renderer may have been destroyed and replaced by another one (categorized lists)
 			if (renderer._destroyed) {
@@ -394,18 +392,11 @@ define([
 			if (this.maxPages && this._idPages.length > this.maxPages) {
 				this._unloadPage(true);
 			}
-			if (this._nextPageLoader) {
-				if (items.length !== this._rangeSpec.count) {
-					// no more next page
-					this._nextPageLoader.destroy();
-					this._nextPageLoader = null;
-				} else {
-					this._nextPageLoader.placeAt(this);
-				}
+			if (items.length === this._rangeSpec.count) {
+				this._enableNextPageLoader();
 			} else {
-				if (items.length === this._rangeSpec.count) {
-					this._createNextPageLoader();
-				}
+				// no more next page
+				this._disableNextPageLoader();
 			}
 			if (renderer) {
 				var next = renderer.nextElementSibling;
@@ -479,57 +470,25 @@ define([
 		//////////// Page loaders creation ///////////////////////////////////////
 
 		/**
-		 * Creates the next page loader widget
+		 * Show the next page loader widget
 		 * @private
 		 */
-		_createNextPageLoader: function () {
-			/* jshint newcap: false*/
-			this._nextPageLoader = new _PageLoaderRenderer({
-				item: {
-					loadMessage: string.substitute(this.loadNextMessage, this),
-					loadingMessage: this.loadingMessage
-				},
-				beforeLoading: function () {
-					var showLoadingPanel = this.hideOnPageLoad && !this.autoPaging;
-					this._setBusy(true, showLoadingPanel);
-				}.bind(this),
-				afterLoading: function () {
-					this._setBusy(false);
-				}.bind(this),
-				performLoading: function () {
-					return this._loadNextPage();
-				}.bind(this),
-				_list: this
-			});
-			this._nextPageLoader.deliver();
-			this._nextPageLoader.placeAt(this);
+		_enableNextPageLoader: function () {
+			this._nextPageLoader.style.display = "";
+		},
+		_disableNextPageLoader: function () {
+			this._nextPageLoader.style.display = "none";
 		},
 
 		/**
-		 * Creates the previous page loader widget
+		 * Show the previous page loader widget
 		 * @private
 		 */
-		_createPreviousPageLoader: function () {
-			/* jshint newcap: false*/
-			this._previousPageLoader = new _PageLoaderRenderer({
-				item: {
-					loadMessage: string.substitute(this.loadPreviousMessage, this),
-					loadingMessage: this.loadingMessage
-				},
-				beforeLoading: function () {
-					var showLoadingPanel = this.hideOnPageLoad && !this.autoPaging;
-					this._setBusy(true, showLoadingPanel);
-				}.bind(this),
-				afterLoading: function () {
-					this._setBusy(false);
-				}.bind(this),
-				performLoading: function () {
-					return this._loadPreviousPage();
-				}.bind(this),
-				_list: this
-			});
-			this._previousPageLoader.deliver();
-			this._previousPageLoader.placeAt(this, "first");
+		_enablePreviousPageLoader: function () {
+			this._previousPageLoader.style.display = "";
+		},
+		_disablePreviousPageLoader: function () {
+			this._previousPageLoader.style.display = "none";
 		},
 
 		//////////// List methods overriding ///////////////////////////////////////
@@ -569,13 +528,9 @@ define([
 					} else if (index <= this._firstLoaded) {
 						this._firstLoaded++;
 						this._lastLoaded++;
-						if (!this._previousPageLoader) {
-							this._createPreviousPageLoader();
-						}
+						this._enablePreviousPageLoader();
 					} else if (index > this._lastLoaded) {
-						if (!this._nextPageLoader) {
-							this._createNextPageLoader();
-						}
+						this._enableNextPageLoader();
 					}
 				} else {
 					sup.apply(this, arguments);
