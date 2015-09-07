@@ -231,6 +231,8 @@ define([
 		cancelMsg: messages["cancel-button-label"],
 		
 		preRender: function () {
+			// TODO: since this code is unrelated to rendering it should go in createdCallback(),
+			// but that currently causes a failure in the unit tests.  Not sure why.
 			this.list = new List();
 			this._defaultList = this.list;
 		},

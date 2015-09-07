@@ -247,7 +247,6 @@ define([
 				this._resetInteractions();
 			},
 
-
 			_refreshMode: function (nextElement) {
 				$(this).removeClass([prefix("push"), prefix("overlay"), prefix("reveal")].join(" "))
 					.addClass(prefix(this.mode));

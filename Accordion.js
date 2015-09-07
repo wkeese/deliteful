@@ -1,5 +1,6 @@
 /** @module deliteful/Accordion */
-define(["dcl/dcl",
+define([
+	"dcl/dcl",
 	"decor/sniff",
 	"requirejs-dplugins/Promise!",
 	"delite/register",
@@ -49,8 +50,7 @@ define(["dcl/dcl",
 	 * @class module:deliteful/Accordion
 	 * @augments module:delite/DisplayContainer
 	 */
-	var Accordion = dcl([DisplayContainer, KeyNav], /** @lends module:deliteful/Accordion# */ {
-
+	return register("d-accordion", [HTMLElement, DisplayContainer, KeyNav], /** @lends module:deliteful/Accordion# */ {
 		/**
 		 * The name of the CSS class of this widget.
 		 * @member {string}
@@ -479,6 +479,4 @@ define(["dcl/dcl",
 		}
 
 	});
-
-	return register("d-accordion", [HTMLElement, Accordion]);
 });

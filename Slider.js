@@ -125,6 +125,7 @@ define([
 					progressBarSize: "height"
 				}
 			},
+
 			/**
 			 * Names of event and CSS properties to use with the current orientation of the Slider.
 			 * _orientation.start = "x|y"
@@ -307,18 +308,21 @@ define([
 				this.valueNode.value = String(this.value);
 			},
 
-			postRender: function () {
+			createdCallback: function () {
 				this._pointerCtx = {
 					target: null, // the element that has focus when user manipulate a pointer
 					offsetVal: 0, // Offset value when use points and drag a handle
 					containerBox: null // to avoid recalculations when moving the slider with a pointer
 				};
+
 				this.on("pointerdown", this.pointerDownHandler.bind(this));
 				this.on("pointermove", this.pointerMoveHandler.bind(this));
 				this.on("lostpointercapture", this.lostCaptureHandler.bind(this));
 				this.on("keydown", this.keyDownHandler.bind(this));
 				this.on("keyup", this.keyUpHandler.bind(this));
+			},
 
+			postRender: function () {
 				// ensure CSS is applied, and apply default tabIndex in case the app doesn't specify tabindex explicitly
 				this.notifyCurrentValue("vertical", "tabIndex");
 
