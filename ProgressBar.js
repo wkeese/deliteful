@@ -99,8 +99,6 @@ define([
 		postRender: function () {
 			// TODO: move this code to the template
 			this.setAttribute("aria-valuemin", 0);
-
-			this.notifyCurrentValue("value", "max");
 		},
 
 		computeProperties: function (props) {

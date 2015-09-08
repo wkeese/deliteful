@@ -323,17 +323,11 @@ define([
 			},
 
 			postRender: function () {
-				// ensure CSS is applied, and apply default tabIndex in case the app doesn't specify tabindex explicitly
-				this.notifyCurrentValue("vertical", "tabIndex");
-
 				if (this.valueNode.value) { // INPUT value
 					// browser back button or value coded on INPUT
 					// the valueNode value has precedence over the widget markup value
 					this.value = this.valueNode.value;
 				}
-
-				// force calculation of the default value in case it is not specified.
-				this.notifyCurrentValue("min", "max", "step", "value");
 			},
 
 			attachedCallback: function () {

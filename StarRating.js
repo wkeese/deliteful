@@ -75,7 +75,6 @@ define([
 		},
 
 		postRender: function () {
-			this.notifyCurrentValue("disabled", "max", "value", "readOnly", "allowZero");
 			this.valueNode.style.display = "none";
 			if (!this.valueNode.parentNode) {
 				this.appendChild(this.valueNode);

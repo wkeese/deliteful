@@ -235,10 +235,6 @@ define([
 			this.setAttribute("aria-readonly", "true");
 		},
 
-		postRender: function () {
-			this.notifyCurrentValue("selectionMode");
-		},
-
 		attachedCallback: dcl.superCall(function (sup) {
 			return function () {
 				//	Using dcl.superCall() to break the default dcl.chainAfter() chaining
