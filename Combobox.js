@@ -381,11 +381,6 @@ define([
 		},
 		
 		_initHandlers: function () {
-			if (this._initHandlersDone) {
-				return; // set handlers only once
-			}
-			this._initHandlersDone = true;
-
 			this.list.on("keynav-child-navigated", function (evt) {
 				var input = this._popupInput || this.inputNode;
 				var navigatedChild = evt.newValue; // never null
