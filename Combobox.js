@@ -783,7 +783,9 @@ define([
 		},
 
 		_setActiveDescendant: function () {
-			var nd = this.list.navigatedDescendant;
+			// Use getEnclosingRenderer() because the active-descendant must be a direct child of the
+			// node specified by aria-owns, in order for JAWS to correctly say "1 of 5" etc.
+			var nd = this.list.getEnclosingRenderer(this.list.navigatedDescendant);
 			if (nd) {
 				if (!nd.id) {
 					nd.id = "d-combobox-item-" + idCounter++;
