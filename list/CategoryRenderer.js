@@ -30,9 +30,8 @@ define([
 					this.setAttribute("role", "row");
 					this.renderNode.setAttribute("role", "columnheader");
 				} else {
-					this.removeAttribute("role");		// alternately, set role=presentation
-					this.renderNode.removeAttribute("tabindex");	// todo: do opposite for when parentRole === grid
-					this.renderNode.setAttribute("role", "heading");
+					this.removeAttribute("tabindex");	// todo: do opposite for when parentRole === grid
+					this.setAttribute("role", "heading");
 				}
 			}
 		}

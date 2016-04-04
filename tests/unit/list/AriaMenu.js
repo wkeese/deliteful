@@ -28,15 +28,9 @@ define([
 		},
 		"aria properties": function () {
 			assert.strictEqual(list.getAttribute("role"), "menu", "role");
-			assert.strictEqual(list.children[0].getAttribute("role"), null, "first renderer role");
-			assert.strictEqual(list.children[0].renderNode.getAttribute("role"), "menuitem",
-					"first renderNode role");
-			assert.strictEqual(list.children[1].getAttribute("role"), null, "second renderer role");
-			assert.strictEqual(list.children[1].renderNode.getAttribute("role"), "menuitem",
-					"second renderNode role");
-			assert.strictEqual(list.children[2].getAttribute("role"), null, "third renderer role");
-			assert.strictEqual(list.children[2].renderNode.getAttribute("role"), "menuitem",
-					"third renderNode role");
+			assert.strictEqual(list.children[0].getAttribute("role"), "menuitem", "first renderer role");
+			assert.strictEqual(list.children[1].getAttribute("role"), "menuitem", "second renderer role");
+			assert.strictEqual(list.children[2].getAttribute("role"), "menuitem", "third renderer role");
 		},
 		"aria properties when moving from menu to grid": function () {
 			list.setAttribute("role", "grid");

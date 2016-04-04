@@ -34,8 +34,8 @@ define([
 				assert.strictEqual(selectionChangeEvent.renderer, firstItem, "event1 renderer");
 				assert.strictEqual(selectionChangeEvent.triggerEvent, event, "event1 triggerEvent");
 				selectionChangeEvent = null;
-				assert.strictEqual(firstItem.renderNode.getAttribute("aria-selected"), "true");
-				assert.strictEqual(secondItem.renderNode.getAttribute("aria-selected"), "false");
+				assert.strictEqual(firstItem.getAttribute("aria-selected"), "true");
+				assert.strictEqual(secondItem.getAttribute("aria-selected"), "false");
 				// Selection event on second item (select)
 				event = {target: secondItem, preventDefault: function () {}};
 				list._spaceKeydownHandler(event);
@@ -45,8 +45,8 @@ define([
 				assert.strictEqual(selectionChangeEvent.renderer, secondItem, "event2 renderer");
 				assert.strictEqual(selectionChangeEvent.triggerEvent, event, "event2 triggerEvent");
 				selectionChangeEvent = null;
-				assert.strictEqual(firstItem.renderNode.getAttribute("aria-selected"), "true");
-				assert.strictEqual(secondItem.renderNode.getAttribute("aria-selected"), "true");
+				assert.strictEqual(firstItem.getAttribute("aria-selected"), "true");
+				assert.strictEqual(secondItem.getAttribute("aria-selected"), "true");
 				// Selection event on first item (deselect)
 				event = {target: firstItem, preventDefault: function () {}};
 				list._spaceKeydownHandler(event);
@@ -57,8 +57,8 @@ define([
 				assert.strictEqual(selectionChangeEvent.triggerEvent, event, "event3 triggerEvent");
 				selectionChangeEvent = null;
 				// 
-				assert.strictEqual(firstItem.renderNode.getAttribute("aria-selected"), "false");
-				assert.strictEqual(secondItem.renderNode.getAttribute("aria-selected"), "true");
+				assert.strictEqual(firstItem.getAttribute("aria-selected"), "false");
+				assert.strictEqual(secondItem.getAttribute("aria-selected"), "true");
 			},
 			"Helper selectionMode 'single'" : function (isListbox) {
 				if (isListbox) {
@@ -83,8 +83,8 @@ define([
 				assert.strictEqual(selectionChangeEvent.renderer, firstItem, "event1 renderer");
 				assert.strictEqual(selectionChangeEvent.triggerEvent, event, "event1 triggerEvent");
 				selectionChangeEvent = null;
-				assert.strictEqual(firstItem.renderNode.getAttribute("aria-selected"), "true");
-				assert.strictEqual(secondItem.renderNode.getAttribute("aria-selected"), "false");
+				assert.strictEqual(firstItem.getAttribute("aria-selected"), "true");
+				assert.strictEqual(secondItem.getAttribute("aria-selected"), "false");
 				// Selection event on second item (select)
 				event = {target: secondItem, preventDefault: function () {}};
 				list._spaceKeydownHandler(event);
@@ -94,8 +94,8 @@ define([
 				assert.strictEqual(selectionChangeEvent.renderer, secondItem, "event2 renderer");
 				assert.strictEqual(selectionChangeEvent.triggerEvent, event, "event2 triggerEvent");
 				selectionChangeEvent = null;
-				assert.strictEqual(firstItem.renderNode.getAttribute("aria-selected"), "false");
-				assert.strictEqual(secondItem.renderNode.getAttribute("aria-selected"), "true");
+				assert.strictEqual(firstItem.getAttribute("aria-selected"), "false");
+				assert.strictEqual(secondItem.getAttribute("aria-selected"), "true");
 				// Selection event on second item (deselect)
 				event = {target: secondItem, preventDefault: function () {}};
 				list._spaceKeydownHandler(event);
@@ -105,8 +105,8 @@ define([
 				assert.strictEqual(selectionChangeEvent.renderer, secondItem, "event3 renderer");
 				assert.strictEqual(selectionChangeEvent.triggerEvent, event, "event3 triggerEvent");
 				selectionChangeEvent = null;
-				assert.strictEqual(firstItem.renderNode.getAttribute("aria-selected"), "false");
-				assert.strictEqual(secondItem.renderNode.getAttribute("aria-selected"), "false");
+				assert.strictEqual(firstItem.getAttribute("aria-selected"), "false");
+				assert.strictEqual(secondItem.getAttribute("aria-selected"), "false");
 			},
 			"Helper selectionMode 'radio'" : function (isListbox) {
 				if (isListbox) {
@@ -131,8 +131,8 @@ define([
 				assert.strictEqual(selectionChangeEvent.renderer, firstItem, "event1 renderer");
 				assert.strictEqual(selectionChangeEvent.triggerEvent, event, "event1 triggerEvent");
 				selectionChangeEvent = null;
-				assert.strictEqual(firstItem.renderNode.getAttribute("aria-selected"), "true");
-				assert.strictEqual(secondItem.renderNode.getAttribute("aria-selected"), "false");
+				assert.strictEqual(firstItem.getAttribute("aria-selected"), "true");
+				assert.strictEqual(secondItem.getAttribute("aria-selected"), "false");
 				// Selection event on second item (select)
 				event = {target: secondItem, preventDefault: function () {}};
 				list._spaceKeydownHandler(event);
@@ -142,14 +142,14 @@ define([
 				assert.strictEqual(selectionChangeEvent.renderer, secondItem, "event2 renderer");
 				assert.strictEqual(selectionChangeEvent.triggerEvent, event, "event2 triggerEvent");
 				selectionChangeEvent = null;
-				assert.strictEqual(firstItem.renderNode.getAttribute("aria-selected"), "false");
-				assert.strictEqual(secondItem.renderNode.getAttribute("aria-selected"), "true");
+				assert.strictEqual(firstItem.getAttribute("aria-selected"), "false");
+				assert.strictEqual(secondItem.getAttribute("aria-selected"), "true");
 				// Selection event on second item (does not deselect)
 				event = {target: secondItem, preventDefault: function () {}};
 				list._spaceKeydownHandler(event);
 				assert.isNull(selectionChangeEvent);
-				assert.strictEqual(firstItem.renderNode.getAttribute("aria-selected"), "false");
-				assert.strictEqual(secondItem.renderNode.getAttribute("aria-selected"), "true");
+				assert.strictEqual(firstItem.getAttribute("aria-selected"), "false");
+				assert.strictEqual(secondItem.getAttribute("aria-selected"), "true");
 			},
 			"Helper delete selected item": function (isListbox) {
 				if (isListbox) {
@@ -186,7 +186,7 @@ define([
 				list.source.put(firstItem.item, {beforeId: thirdItem.item.id});
 				var secondItem = list.children[1];
 				assert(list.isSelected(secondItem.item), "item selected after move");
-				assert(secondItem.renderNode.getAttribute("aria-selected"),
+				assert(secondItem.getAttribute("aria-selected"),
 						"item selected after move (aria-selected attribute)");
 			},
 			"Helper aria properties and classes when selection mode is single": function (isListbox) {
@@ -201,13 +201,13 @@ define([
 						"no aria-multiselectable attribute expected");
 				var firstItem = list.children[0];
 				assert.isTrue(firstItem.className.indexOf("d-selected") === -1, "no d-selected class expected");
-				assert.strictEqual(firstItem.renderNode.getAttribute("aria-selected"), "false",
+				assert.strictEqual(firstItem.getAttribute("aria-selected"), "false",
 						"no aria-selected attribute 'false' expected on first item");
 				// select first item
 				var event = {target: firstItem, preventDefault: function () {}};
 				list._spaceKeydownHandler(event);
 				assert.isTrue(firstItem.className.indexOf("d-selected") >= 0, "d-selected class expected");
-				assert.strictEqual(firstItem.renderNode.getAttribute("aria-selected"), "true",
+				assert.strictEqual(firstItem.getAttribute("aria-selected"), "true",
 						"aria-selected attribute 'true' expected on first item after selection");
 			},
 			"Helper aria properties and classes when selection mode is radio": function (isListbox) {
@@ -222,13 +222,13 @@ define([
 						"no aria-multiselectable attribute expected");
 				var firstItem = list.children[0];
 				assert.isTrue(firstItem.className.indexOf("d-selected") === -1, "no d-selected class expected");
-				assert.strictEqual(firstItem.renderNode.getAttribute("aria-selected"), "false",
+				assert.strictEqual(firstItem.getAttribute("aria-selected"), "false",
 						"no aria-selected attribute 'false' expected on first item");
 				// select first item
 				var event = {target: firstItem, preventDefault: function () {}};
 				list._spaceKeydownHandler(event);
 				assert.isTrue(firstItem.className.indexOf("d-selected") >= 0, "d-selected class expected");
-				assert.strictEqual(firstItem.renderNode.getAttribute("aria-selected"), "true",
+				assert.strictEqual(firstItem.getAttribute("aria-selected"), "true",
 						"aria-selected attribute 'true' expected on first item after selection");
 			},
 			"Helper aria properties and classes when selection mode is multiple":
@@ -244,13 +244,13 @@ define([
 						"aria-multiselectable attribute expected");
 				var firstItem = list.children[0];
 				assert.isTrue(firstItem.className.indexOf("d-selected") === -1, "no d-selected class expected");
-				assert.strictEqual(firstItem.renderNode.getAttribute("aria-selected"), "false",
+				assert.strictEqual(firstItem.getAttribute("aria-selected"), "false",
 						"aria-selected attribute expected on first item");
 				// select first item
 				var event = {target: firstItem, preventDefault: function () {}};
 				list._spaceKeydownHandler(event);
 				assert.isTrue(firstItem.className.indexOf("d-selected") >= 0, "d-selected class expected");
-				assert.strictEqual(firstItem.renderNode.getAttribute("aria-selected"), "true",
+				assert.strictEqual(firstItem.getAttribute("aria-selected"), "true",
 						"aria-selected attribute expected on first item after selection");
 			}
 		};
@@ -382,16 +382,16 @@ define([
 			assert.isTrue(list.className.indexOf("d-multiselectable") === -1, "A: d-multiselectable class");
 			assert.isTrue(list.className.indexOf("d-selectable") >= 0, "A: d-selectable class");
 			// first item
-			assert.strictEqual(firstItem.renderNode.getAttribute("aria-selected"), "true",
+			assert.strictEqual(firstItem.getAttribute("aria-selected"), "true",
 			"A: aria-selected attribute expected on first item");
 			assert.isTrue(firstItem.className.indexOf("d-selected") >= 0, "A: d-selected class on first item");
 			// second item
-			assert.strictEqual(list.children[1].renderNode.getAttribute("aria-selected"), "false",
+			assert.strictEqual(list.children[1].getAttribute("aria-selected"), "false",
 					"A: aria-selected 'false' expected on second item");
 			assert.isTrue(list.children[1].className.indexOf("d-selected") === -1,
 					"A: no d-selected class on second item");
 			// third item
-			assert.strictEqual(list.children[2].renderNode.getAttribute("aria-selected"), "false",
+			assert.strictEqual(list.children[2].getAttribute("aria-selected"), "false",
 					"A: aria-selected 'false' expected on third item");
 			assert.isTrue(list.children[2].className.indexOf("d-selected") === -1,
 					"A: no d-selected class on third item");
@@ -403,17 +403,17 @@ define([
 			assert.isTrue(list.className.indexOf("d-multiselectable") >= 0, "B: d-multiselectable class");
 			assert.isTrue(list.className.indexOf("d-selectable") === -1, "B: d-selectable class");
 			// first item
-			assert.strictEqual(list.children[0].renderNode.getAttribute("aria-selected"), "true",
+			assert.strictEqual(list.children[0].getAttribute("aria-selected"), "true",
 				"B: aria-selected attribute expected on first item");
 			assert.isTrue(list.children[0].className.indexOf("d-selected") >= 0,
 					"B: d-selected class on first item");
 			// second item
-			assert.strictEqual(list.children[1].renderNode.getAttribute("aria-selected"), "false",
+			assert.strictEqual(list.children[1].getAttribute("aria-selected"), "false",
 			"B: aria-selected attribute expected on second item");
 			assert.isTrue(list.children[1].className.indexOf("d-selected") === -1,
 			"B: d-selected class on second item");
 			// third item
-			assert.strictEqual(list.children[2].renderNode.getAttribute("aria-selected"), "false",
+			assert.strictEqual(list.children[2].getAttribute("aria-selected"), "false",
 			"B: aria-selected attribute expected on third item");
 			assert.isTrue(list.children[2].className.indexOf("d-selected") === -1,
 			"B: d-selected class on third item");
@@ -425,17 +425,17 @@ define([
 			assert.isTrue(list.className.indexOf("d-multiselectable") === -1, "C: d-multiselectable class");
 			assert.isTrue(list.className.indexOf("d-selectable") === -1, "C: d-selectable class");
 			// first item
-			assert.isFalse(list.children[0].renderNode.hasAttribute("aria-selected"),
+			assert.isFalse(list.children[0].hasAttribute("aria-selected"),
 			"C: no aria-selected attribute expected on first item");
 			assert.isTrue(list.children[0].className.indexOf("d-selected") === -1,
 			"C: d-selected class on first item");
 			// second item
-			assert.isFalse(list.children[1].renderNode.hasAttribute("aria-selected"),
+			assert.isFalse(list.children[1].hasAttribute("aria-selected"),
 			"C: no aria-selected attribute expected on second item");
 			assert.isTrue(list.children[1].className.indexOf("d-selected") === -1,
 			"C: d-selected class on second item");
 			// third item
-			assert.isFalse(list.children[2].renderNode.hasAttribute("aria-selected"),
+			assert.isFalse(list.children[2].hasAttribute("aria-selected"),
 			"C: no aria-selected attribute expected on third item");
 			assert.isTrue(list.children[2].className.indexOf("d-selected") === -1,
 			"C: d-selected class on third item");

@@ -210,13 +210,13 @@ define([
 						list.source.push({id: "2", label: "item 3"});
 						list.deliver();
 						var children = list.children;
-						assert.strictEqual(list._getFirst(), children[0].renderNode);
+						assert.strictEqual(list._getFirst(), children[0]);
 						list.categoryAttr = "label";
 						list.deliver();
 						list.on("query-success", d.callback(function () {
 							children = list.children;
 							assert.strictEqual(children[0].className, "d-list-category", "first is category");
-							assert.strictEqual(list._getFirst(), children[0].renderNode, "first renderer is category");
+							assert.strictEqual(list._getFirst(), children[0], "first renderer is category");
 						}));
 					}));
 					return d;
@@ -232,7 +232,7 @@ define([
 						list.source.push({id: "2", label: "item 3"});
 						list.deliver();
 						var children = list.children;
-						assert.strictEqual(list._getLast(), children[2].renderNode);
+						assert.strictEqual(list._getLast(), children[2]);
 					}));
 					return d;
 				},

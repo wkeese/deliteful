@@ -272,9 +272,8 @@ define([
 					// update aria-selected attribute on unselected items
 					for (var i = 0; i < this.children.length; i++) {
 						var child = this.children[i];
-						if (child.renderNode // no renderNode for the loading panel child
-							&& child.renderNode.hasAttribute("aria-selected")) {
-							child.renderNode.removeAttribute("aria-selected");
+						if (child.hasAttribute("aria-selected")) {
+							child.removeAttribute("aria-selected");
 							$(child).removeClass(this._cssClasses.selected);
 						}
 					}
@@ -289,9 +288,8 @@ define([
 					for (i = 0; i < this.children.length; i++) {
 						child = this.children[i];
 						if (child.tagName.toLowerCase() === this.itemRenderer.tag
-								&& child.renderNode // no renderNode for the loading panel child
-								&& !child.renderNode.hasAttribute("aria-selected")) {
-							child.renderNode.setAttribute("aria-selected", "false");
+								&& !child.hasAttribute("aria-selected")) {
+							child.setAttribute("aria-selected", "false");
 							$(child).removeClass(this._cssClasses.selected); // TODO: NOT NEEDED ?
 						}
 					}
@@ -436,7 +434,7 @@ define([
 					var renderer = this.getRendererByItemId(this.getIdentity(currentItem));
 					if (renderer) {
 						var itemSelected = !!this.isSelected(currentItem);
-						renderer.renderNode.setAttribute("aria-selected", itemSelected ? "true" : "false");
+						renderer.setAttribute("aria-selected", itemSelected ? "true" : "false");
 						$(renderer).toggleClass(this._cssClasses.selected, itemSelected);
 					}
 				}
@@ -704,7 +702,7 @@ define([
 			if (this._getFocusedRenderer() === renderer) {
 				var nextFocusRenderer = this._getNextRenderer(renderer, 1) || this._getNextRenderer(renderer, -1);
 				if (nextFocusRenderer) {
-					this.navigateTo(nextFocusRenderer.renderNode);
+					this.navigateTo(nextFocusRenderer);
 				}
 			}
 			if (!keepSelection && !this.isCategoryRenderer(renderer) && this.isSelected(renderer.item)) {
@@ -734,7 +732,7 @@ define([
 			});
 			if (this.selectionMode !== "none") {
 				var itemSelected = !!this.isSelected(item);
-				renderer.renderNode.setAttribute("aria-selected", itemSelected ? "true" : "false");
+				renderer.setAttribute("aria-selected", itemSelected ? "true" : "false");
 				$(renderer).toggleClass(this._cssClasses.selected, itemSelected);
 			}
 			return renderer;
@@ -925,11 +923,9 @@ define([
 		 * @private
 		 */
 		descendantSelector: function (child) {
-			var enclosingRenderer = this.getEnclosingRenderer(child);
-			return !enclosingRenderer ||
-				(this.getAttribute("role") === "listbox" && this.isCategoryRenderer(enclosingRenderer)) ?
-				false :
-				$(child).hasClass(this._cssClasses.cell) || child.hasAttribute("navindex");
+			return child.hasAttribute("navindex") ||
+				(this.getAttribute("role") === "grid" ? $(child).hasClass(this._cssClasses.cell) :
+				child.tagName.toLowerCase() === this.itemRenderer.tag.toLowerCase());
 		},
 
 		/**
@@ -950,20 +946,16 @@ define([
 		}),
 
 		focus: function () {
-			// Focus the previously focused child of the first visible grid cell
+			// Focus the previously focused child or the first visible grid cell
 			if (this._previousFocusedChild) {
 				this.navigateTo(this._previousFocusedChild);
 			} else {
-				var cell = this._getFirst();
-				if (cell) {
-					while (cell) {
-						if (this.getTopDistance(cell) >= 0) {
-							break;
-						}
-						var nextRenderer = cell.parentNode.nextElementSibling;
-						cell = nextRenderer ? nextRenderer.renderNode : null;
+				var row = this._getFirst();
+				if (row) {
+					while (row && this.getTopDistance(row) < 0) {
+						row = row.nextElementSibling;
 					}
-					this.navigateTo(cell);
+					this.navigateTo(row);
 				}
 			}
 		},
@@ -982,34 +974,43 @@ define([
 
 		// Page Up/Page down key support
 		/**
-		 * Returns the first cell in the list.
+		 * Returns the first navigable item in the list.
 		 * @private
 		 * @returns {Element}
 		 */
 		_getFirst: function () {
-			var first = this.querySelector("." + this._cssClasses.cell);
-			if (first && this.getAttribute("role") === "listbox"
-					&& this.isCategoryRenderer(this.getEnclosingRenderer(first))) {
-				first = this.getNext(first, 1);
+			if (this.getAttribute("role") === "grid") {
+				return this._getFirstRenderer();
+			} else {
+				return this.querySelector(this.itemRenderer.tag);
 			}
-			return first;
 		},
 
 		/**
-		 * Returns the last cell in the list.
+		 * Returns the last navigable item in the list.
 		 * @private
 		 * @returns {Element}
 		 */
 		_getLast: function () {
-			// summary:
-			var cells = this.querySelectorAll("." + this._cssClasses.cell);
-			var last = cells.length ? cells.item(cells.length - 1) : null;
-			if (last && this.getAttribute("role") === "listbox"
-					&& this.isCategoryRenderer(this.getEnclosingRenderer(last))) {
-				last = this.getNext(last, -1);
+			if (this.getAttribute("role") === "grid") {
+				return this._getLastRenderer();
+			} else {
+				var rows = this.querySelectorAll(this.itemRenderer.tag);
+				return rows[rows.length - 1];
 			}
-			return last;
 		},
+
+		/**
+		 * Navigate to the specified renderer, or if role=grid, then the role=cell child of the specified renderer.
+		 */
+		navigateTo: dcl.superCall(function (sup) {
+			return function (child, last, triggerEvent) {
+				if (this.getAttribute("role") === "grid" && child.renderNode) {
+					child = child.renderNode;		// navigate to role=cell, not role=row
+				}
+				sup.call(this, child, last, triggerEvent);
+			};
+		}),
 
 		// Simple arrow key support.
 		downKeyHandler: function (evt) {
@@ -1024,7 +1025,7 @@ define([
 					next = next.nextElementSibling;
 				}
 			}
-			this.navigateTo(next ? next.renderNode : this._getFirst(), false, evt);
+			this.navigateTo(next || this._getFirst(), false, evt);
 		},
 
 		upKeyHandler: function (evt) {
@@ -1039,7 +1040,7 @@ define([
 					next = next.previousElementSibling;
 				}
 			}
-			this.navigateTo(next ? next.renderNode : this._getLast(), false, evt);
+			this.navigateTo(next || this._getLast(), false, evt);
 		},
 
 		// Remap Page Up -> Home and Page Down -> End
@@ -1059,8 +1060,8 @@ define([
 
 			// Letter key navigation support.
 			var renderer = this.getEnclosingRenderer(child);
-			return dir > 0 ? renderer.nextElementSibling ? renderer.nextElementSibling.renderNode : this._getFirst() :
-				renderer.previousElementSibling ? renderer.previousElementSibling.renderNode : this._getLast();
+			return dir > 0 ? renderer.nextElementSibling || this._getFirst() :
+				renderer.previousElementSibling || this._getLast();
 		},
 
 		//////////// Extra methods for Keyboard navigation ///////////////////////////////////////
@@ -1135,7 +1136,7 @@ define([
 		 * @private
 		 */
 		_leaveActionableMode: function () {
-			this.navigateTo(this._getFocusedRenderer().renderNode);
+			this.navigateTo(this._getFocusedRenderer());
 		},
 
 		/**

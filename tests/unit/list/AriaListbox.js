@@ -46,15 +46,9 @@ define([
 
 			assert.strictEqual(list.getAttribute("role"), "listbox", "role");
 			assert.isFalse(list.hasAttribute("aria-readonly"), "aria-readonly only for role=grid");
-			assert.strictEqual(list.children[0].getAttribute("role"), null, "first renderer role");
-			assert.strictEqual(list.children[0].renderNode.getAttribute("role"), "option",
-					"first renderNode role");
-			assert.strictEqual(list.children[1].getAttribute("role"), null, "second renderer role");
-			assert.strictEqual(list.children[1].renderNode.getAttribute("role"), "option",
-					"second renderNode role");
-			assert.strictEqual(list.children[2].getAttribute("role"), null, "third renderer role");
-			assert.strictEqual(list.children[2].renderNode.getAttribute("role"), "option",
-					"third renderNode role");
+			assert.strictEqual(list.children[0].getAttribute("role"), "option", "first role");
+			assert.strictEqual(list.children[1].getAttribute("role"), "option", "second role");
+			assert.strictEqual(list.children[2].getAttribute("role"), "option", "third role");
 		},
 
 		"aria properties when moving from listbox to grid": function () {

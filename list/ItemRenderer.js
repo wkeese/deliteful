@@ -45,8 +45,7 @@ define([
 					this.setAttribute("role", "row");
 					this.renderNode.setAttribute("role", "gridcell");
 				} else {
-					this.removeAttribute("role");		// alternately, set role=presentation
-					this.renderNode.setAttribute("role", {
+					this.setAttribute("role", {
 						listbox: "option",
 						menu: "menuitem"	// there's also menuitemcheckbox and menuitemradio
 					}[this.parentRole]);
