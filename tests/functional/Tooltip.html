@@ -1,41 +1,40 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-	<meta charset="utf-8" />
-	<title>CSS3 tooltip</title>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta name="viewport"
+		  content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+
+	<title>Tooltip</title>
 
 	<style type="text/css">
-
-		/*
-			Triangle with Shadow
-		*/
-
-		.triangle-with-shadow {
-			width: 100px;
-			height: 100px;
-			position: relative;
-			overflow: hidden;
-			box-shadow: 0 16px 10px -17px rgba(0,0,0,0.5);
-			transform: scale(2, 1);
-		}
-		.triangle-with-shadow:after {
-			content: "";
-			position: absolute;
-			width: 50px;
-			height: 50px;
-			background: #999;
-			transform: rotate(45deg);
-			top: 75px;
-			left: 25px;
-			box-shadow: -1px -1px 10px -2px rgba(0,0,0,0.5);
+		/* set page background to blue just to check the tooltip connector is rendering correctly */
+		body, html {
+			background: lightblue;
+			height: 100%;
 		}
 	</style>
 
+	<!-- For testing purposes.  Real applications should load the AMD loader directly. -->
+	<script type="text/javascript" src="../boilerplate.js"></script>
 
+	<script type="text/javascript">
+		var ready = false; // set to true when the test page is ready
+		require(["delite/register", "deliteful/Tooltip", "requirejs-domready/domReady!"], function (register) {
+			register.deliver();
+			ready = true;
+		});
+	</script>
 </head>
 <body>
+	<h1>Tooltip functional test</h1>
 
-<div class="triangle-with-shadow"></div>
+	<d-tooltip style="position: absolute; top: 30px; left: 30px;">
+		This is a tooltip.<br>
+		Another line.<br>
+		Another line.<br>
+		Another line.<br>
+	</d-tooltip>
 </body>
 </html>

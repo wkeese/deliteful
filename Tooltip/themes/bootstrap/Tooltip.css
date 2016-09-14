@@ -1,0 +1,36 @@
+.d-tooltip {
+  margin: 50px;
+  padding: 10px;
+  max-width: 300px;
+  position: relative;
+  z-index: 0;
+}
+/*
+	Triangle with Shadow
+	Thanks to https://css-tricks.com/d-tooltip-connector/ for initial code.
+*/
+.d-tooltip-connector {
+  width: 10px;
+  height: 20px;
+  overflow: hidden;
+  z-index: 1;
+  background: transparent;
+  position: absolute;
+  left: -10px;
+  top: 20px;
+}
+.d-tooltip-connector:after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  left: 3px;
+  top: 2px;
+  transform: rotate(45deg);
+}
+.d-tooltip,
+.d-tooltip-connector:after {
+  border: solid black 1px;
+  box-shadow: 0 0 1em gold;
+  background: white;
+}
