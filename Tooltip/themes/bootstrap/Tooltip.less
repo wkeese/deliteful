@@ -9,24 +9,45 @@
 	z-index: 0;
 }
 
-// The triangle pointer coming out of the rectangle.
+// Wrapper for the triangle pointer coming out of the tooltip.
 // It's actually implemented as a square rotated 45 degrees and half hidden.
 // Thanks to https://css-tricks.com/triangle-with-shadow/ for the idea.
 .d-tooltip-connector {
-	width: 10px;
-	height: 20px;
 	position: absolute;
 	overflow: hidden;
 	z-index: 1;
 	background: transparent;
 
-	// Position the connector relative to the tooltip box.
-	// The position along the edge will be set programatically to align
+	// Rules to position wrapper on the side of the tooltip next to the anchor.
+	// The position along the side will be set programatically to align
 	// the point of the triangle with the center of the anchor node.
 	position: absolute;
-	left: -10px;
-	top: 20px;
+	.d-tooltip-right > &, .d-tooltip-left > & {
+		width: 10px;
+		height: 20px;
+	}
+	.d-tooltip-left > & {
+		right: -10px;
+		top: 20px;
+	}
+	.d-tooltip-right > & {
+		left: -10px;
+		top: 20px;
+	}
+	.d-tooltip-above > &, .d-tooltip-below > & {
+		width: 20px;
+		height: 10px;
+	}
+	.d-tooltip-above > & {
+		bottom: -10px;
+		left: 20px;
+	}
+	.d-tooltip-below > & {
+		top: -10px;
+		left: 20px;
+	}
 
+	// The rotated square inside the wrapper (half hidden to appear as a triangle).
 	&:after {
 		content: "";
 		position: absolute;
@@ -35,8 +56,18 @@
 		// it makes a triangle about 20x10.
 		width: 14px;
 		height: 14px;
+
 		left: 3px;
-		top: 2px;
+		.d-tooltip-left > & {
+			left: auto;
+			right: 3px;
+		}
+
+		top: 3px;
+		.d-tooltip-above > & {
+			top: auto;
+			bottom: 3px;
+		}
 
 		transform: rotate(45deg);
 	}

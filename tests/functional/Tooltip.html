@@ -36,6 +36,8 @@
 			"requirejs-domready/domReady!"
 		], function (register, HasDropDown) {
 			register("my-tooltip-button", [HTMLElement, HasDropDown], {
+				dropDownPosition: ["below-centered", "above-centered", "after-centered", "before-centered"],
+
 				loadDropDown: function () {
 					return document.getElementById("my-tooltip");
 				}
@@ -47,7 +49,32 @@
 </head>
 <body>
 	<h1>Tooltip functional test</h1>
-	<my-tooltip-button>show tooltip</my-tooltip-button>
+	<my-tooltip-button style="position: absolute; top: 0; left: 45%;">
+		show below
+	</my-tooltip-button>
+
+	<my-tooltip-button style="position: absolute; top: 45%; left: 0;" dropDownPosition="after-centered before-centered">
+		show to right
+	</my-tooltip-button>
+
+	<my-tooltip-button style="position: absolute; top: 45%; right: 0;" dropDownPosition="before-centered after-centered">
+		show to left
+	</my-tooltip-button>
+	
+	<!-- Check that tooltip and connector are positioned properly when tooltip can't be centered above/below anchor -->
+	<my-tooltip-button style="position: absolute; bottom: 0; left: 0;" dropDownPosition="above-centered">
+		show above
+	</my-tooltip-button>
+	
+	<my-tooltip-button style="position: absolute; bottom: 0; left: 45%;" dropDownPosition="above-centered">
+		show above
+	</my-tooltip-button>
+
+	<!-- Check that tooltip and connector are positioned properly when tooltip can't be centered before/after anchor -->
+	<my-tooltip-button style="position: absolute; bottom: 0; right: 0;" dropDownPosition="before-centered after-centered">
+		show to left
+	</my-tooltip-button>
+
 	<d-tooltip id="my-tooltip"style="visibility: hidden">
 		This is a tooltip.<br>
 		Another line.<br>
