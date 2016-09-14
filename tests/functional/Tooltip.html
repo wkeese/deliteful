@@ -14,6 +14,14 @@
 			background: lightblue;
 			height: 100%;
 		}
+
+		my-tooltip-button {
+			border: solid darkblue 1px;
+			background: white;
+			padding: 5px;
+			color: darkblue;
+			cursor: pointer;
+		}
 	</style>
 
 	<!-- For testing purposes.  Real applications should load the AMD loader directly. -->
@@ -21,7 +29,17 @@
 
 	<script type="text/javascript">
 		var ready = false; // set to true when the test page is ready
-		require(["delite/register", "deliteful/Tooltip", "requirejs-domready/domReady!"], function (register) {
+		require([
+			"delite/register",
+			"delite/HasDropDown",
+			"deliteful/Tooltip",
+			"requirejs-domready/domReady!"
+		], function (register, HasDropDown) {
+			register("my-tooltip-button", [HTMLElement, HasDropDown], {
+				loadDropDown: function () {
+					return document.getElementById("my-tooltip");
+				}
+			});
 			register.deliver();
 			ready = true;
 		});
@@ -29,8 +47,8 @@
 </head>
 <body>
 	<h1>Tooltip functional test</h1>
-
-	<d-tooltip style="position: absolute; top: 30px; left: 30px;">
+	<my-tooltip-button>show tooltip</my-tooltip-button>
+	<d-tooltip id="my-tooltip"style="visibility: hidden">
 		This is a tooltip.<br>
 		Another line.<br>
 		Another line.<br>
