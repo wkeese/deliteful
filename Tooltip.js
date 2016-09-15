@@ -2,17 +2,18 @@
 define([
 	"delite/register",
 	"delite/Container",
+	"delite/Dialog",
 	"delite/handlebars!./Tooltip/Tooltip.html",
 	"requirejs-dplugins/jquery!attributes/classes",
 	"delite/theme!./Tooltip/themes/{{theme}}/Tooltip.css"
-], function (register, Container, template, $) {
+], function (register, Container, Dialog, template, $) {
 
 	/**
 	 * A tooltip widget, to be used as a popup.
 	 * @class module:deliteful/Tooltip
 	 * @augments module:delite/Container
 	 */
-	return register("d-tooltip", [HTMLElement, Container], /** @lends module:deliteful/Tooltip# */ {
+	return register("d-tooltip", [HTMLElement, Container, Dialog], /** @lends module:deliteful/Tooltip# */ {
 		/**
 		 * The name of the CSS class of this widget.
 		 * @member {string}
@@ -21,6 +22,12 @@ define([
 		baseClass: "d-tooltip",
 
 		template: template,
+
+		focus: function () {
+			// Focus on first field
+			this._getFocusItems();
+			this._firstFocusItem.focus();
+		},
 
 		// Configure widget to be displayed in given position relative to the button.
 		// This is called from the dijit.popup code, and should not be called directly.
