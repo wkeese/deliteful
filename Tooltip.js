@@ -23,6 +23,10 @@ define([
 
 		template: template,
 
+		createdCallback: function () {
+			this.on("popup-after-show", this.onOpen.bind(this));
+		},
+
 		focus: function () {
 			// Focus on first field
 			this._getFocusItems();
@@ -56,15 +60,9 @@ define([
 			this._currentOrientClass = newC;
 		},
 
+		// Called when dialog is displayed.
+		//	This is called from the delite/popup code, and should not be called directly.
 		onOpen: function (/*Object*/ pos) {
-			// summary:
-			//		Called when dialog is displayed.
-			//		This is called from the dijit.popup code, and should not be called directly.
-			// tags:
-			//		protected
-
-			this.orient(this.domNode, pos.aroundCorner, pos.corner);
-
 			// Position the tooltip connector for middle alignment.
 			// This could not have been done in orient() since the tooltip wasn't positioned at that time.
 			var aroundNodeCoords = pos.aroundNodePos;
@@ -73,6 +71,7 @@ define([
 				this.connectorNode.style.left = "";
 			} else if (pos.corner.charAt(1) === "M" && pos.aroundCorner.charAt(1) === "M") {
 				this.connectorNode.style.left = aroundNodeCoords.x + ((aroundNodeCoords.w - this.connectorNode.offsetWidth) >> 1) - pos.x + "px";
+				this.connectorNode.style.top = "";
 			}
 		}
 	});

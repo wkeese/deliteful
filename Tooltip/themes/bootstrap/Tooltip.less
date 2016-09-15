@@ -2,11 +2,24 @@
 
 // The rectangular part of the tooltip.
 .d-tooltip {
-	margin: 10px;   	// match the amount the connector extends beyond the border of the tooltip.
 	padding: 10px;
 	max-width: 300px;
 	position: relative;
 	z-index: 0;
+}
+
+// Set margin to make room for connector plus some space between the connector and the anchor node.
+.d-tooltip-left {
+	margin-right: 15px;
+}
+.d-tooltip-right {
+	margin-left: 15px;
+}
+.d-tooltip-above {
+	margin-bottom: 15px;
+}
+.d-tooltip-below {
+	margin-top: 15px;
 }
 
 // Wrapper for the triangle pointer coming out of the tooltip.
@@ -82,7 +95,7 @@
 }
 
 // Disable white background and box shadow on d-popup-wrapper.
-// It doesn't work with the tooltip's irregular shape
+// It doesn't work with the tooltip's irregular shape.
 .d-tooltip-popup {
 	background: transparent;
 	-webkit-box-shadow: none;
