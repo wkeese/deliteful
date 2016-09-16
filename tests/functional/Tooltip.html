@@ -56,6 +56,35 @@
 				}
 			});
 
+			// Function to get position of node, correcting for IE's like of "bottom" and "right" properties.
+			function gbcr (node) {
+				var rect = node.getBoundingClientRect();
+
+				return {
+					top: rect.top,
+					bottom: rect.top + rect.height,
+					left: rect.left,
+					right: rect.left + rect.width,
+					width: rect.width,
+					height: rect.height,
+					hcenter: rect.left + rect.width / 2,
+					vcenter: rect.top + rect.height / 2
+				};
+			}
+
+			// Setup global method to be used by tests
+			getPos = function(anchorId) {
+				var anchor = document.getElementById(anchorId);
+				var tooltip = document.getElementById("my-tooltip"),
+					connector = tooltip.connectorNode;
+
+				return {
+					anchor: gbcr(anchor),
+					tooltip: gbcr(tooltip),
+					connector: gbcr(connector)
+				};
+			};
+
 			register.deliver();
 			ready = true;
 		});
@@ -63,29 +92,29 @@
 </head>
 <body>
 	<h1>Tooltip functional test</h1>
-	<my-tooltip-button style="position: absolute; top: 0; left: 45%;">
+	<my-tooltip-button id="top" style="position: absolute; top: 0; left: 45%;">
 		show below
 	</my-tooltip-button>
 
-	<my-tooltip-button style="position: absolute; top: 45%; left: 0;" dropDownPosition="after-centered before-centered">
+	<my-tooltip-button id="left" style="position: absolute; top: 45%; left: 0;" dropDownPosition="after-centered before-centered">
 		show to right
 	</my-tooltip-button>
 
-	<my-tooltip-button style="position: absolute; top: 45%; right: 0;" dropDownPosition="before-centered after-centered">
+	<my-tooltip-button id="right" style="position: absolute; top: 45%; right: 0;" dropDownPosition="before-centered after-centered">
 		show to left
 	</my-tooltip-button>
 	
 	<!-- Check that tooltip and connector are positioned properly when tooltip can't be centered above/below anchor -->
-	<my-tooltip-button style="position: absolute; bottom: 0; left: 0;" dropDownPosition="above-centered">
+	<my-tooltip-button id="bottom-left" style="position: absolute; bottom: 0; left: 0;" dropDownPosition="above-centered">
 		show above
 	</my-tooltip-button>
 	
-	<my-tooltip-button style="position: absolute; bottom: 0; left: 45%;" dropDownPosition="above-centered">
+	<my-tooltip-button id="bottom" style="position: absolute; bottom: 0; left: 45%;" dropDownPosition="above-centered">
 		show above
 	</my-tooltip-button>
 
 	<!-- Check that tooltip and connector are positioned properly when tooltip can't be centered before/after anchor -->
-	<my-tooltip-button style="position: absolute; bottom: 0; right: 0;" dropDownPosition="before-centered after-centered">
+	<my-tooltip-button id="bottom-right" style="position: absolute; bottom: 0; right: 0;" dropDownPosition="before-centered after-centered">
 		show to left
 	</my-tooltip-button>
 
