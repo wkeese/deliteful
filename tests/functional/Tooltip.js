@@ -35,11 +35,11 @@ define([
 							tooltip = res.tooltip,
 							connector = res.connector;
 						assert.isBelow(anchor.bottom, tooltip.top, "tooltip below anchor");
-						assert.isBelow(Math.abs(anchor.hcenter - tooltip.hcenter), 1.5,
+						assert.isBelow(Math.abs(anchor.hcenter - tooltip.hcenter), 2,
 							"tooltip horizontally centered with anchor " + anchor.hcenter + ", " + tooltip.hcenter);
 						assert.isBelow(Math.abs(connector.bottom - tooltip.top), 1.1,
 							"connector above tooltip rectangle");
-						assert.isBelow(Math.abs(anchor.hcenter - connector.hcenter), 1,
+						assert.isBelow(Math.abs(anchor.hcenter - connector.hcenter), 1.1,
 							"connector horizontally centered with anchor");
 					});
 			},
@@ -71,7 +71,7 @@ define([
 						assert.isBelow(tooltip.bottom, anchor.top, "tooltip above anchor");
 						assert.isBelow(Math.abs(connector.top - tooltip.bottom), 1.1,
 							"connector below tooltip rectangle");
-						assert.isBelow(Math.abs(anchor.hcenter - connector.hcenter), 1,
+						assert.isBelow(Math.abs(anchor.hcenter - connector.hcenter), 1.1,
 							"connector horizontally centered with anchor (rather than with tooltip)");
 					});
 			},
