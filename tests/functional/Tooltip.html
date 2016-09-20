@@ -15,7 +15,7 @@
 			height: 100%;
 		}
 
-		my-tooltip-button {
+		button[is=d-dropdown-button] {
 			border: solid darkblue 1px;
 			background: white;
 			padding: 5px;
@@ -41,21 +41,10 @@
 		var ready = false; // set to true when the test page is ready
 		require([
 			"delite/register",
-			"delite/HasDropDown",
+			"deliteful/DropDownButton",
 			"deliteful/Tooltip",
 			"requirejs-domready/domReady!"
-		], function (register, HasDropDown) {
-			register("my-tooltip-button", [HTMLElement, HasDropDown], {
-				dropDownPosition: ["below-centered", "above-centered", "after-centered", "before-centered"],
-
-				focusOnKeyboardOpen: true,
-				focusOnPointerOpen: true,
-
-				loadDropDown: function () {
-					return document.getElementById("my-tooltip");
-				}
-			});
-
+		], function (register) {
 			// Function to get position of node, correcting for IE's like of "bottom" and "right" properties.
 			function gbcr (node) {
 				var rect = node.getBoundingClientRect();
@@ -92,37 +81,66 @@
 </head>
 <body>
 	<h1>Tooltip functional test</h1>
-	<my-tooltip-button id="top" style="position: absolute; top: 0; left: 45%;">
-		show below
-	</my-tooltip-button>
+	<button is="d-dropdown-button" id="top" style="position: absolute; top: 0; left: 45%;" dropDownPosition="below-centered">
+		<d-label>show below</d-label>
+		<d-tooltip style="visibility: hidden">
+			<label for="name">Name:</label> <input id="name"> <br>
+			<label for="age">Age:</label> <input id="age"> <br>
+			<label for="sex">Sex:</label> <input id="sex"> <br><br>
+			<button type="submit">OK</button>
+		</d-tooltip>
+	</button>
 
-	<my-tooltip-button id="left" style="position: absolute; top: 45%; left: 0;" dropDownPosition="after-centered before-centered">
-		show to right
-	</my-tooltip-button>
+	<button is="d-dropdown-button" id="left" style="position: absolute; top: 45%; left: 0;" dropDownPosition="after-centered before-centered">
+		<d-label>show to right</d-label>
+		<d-tooltip style="visibility: hidden">
+			I'm a tooltip.<br>
+			I appear to the right.<br>
+			<input><br>
+			<button>OK</button>
+		</d-tooltip>
+	</button>
 
-	<my-tooltip-button id="right" style="position: absolute; top: 45%; right: 0;" dropDownPosition="before-centered after-centered">
-		show to left
-	</my-tooltip-button>
+	<button is="d-dropdown-button" id="right" style="position: absolute; top: 45%; right: 0;" dropDownPosition="before-centered after-centered">
+		<d-label>show to left</d-label>
+		<d-tooltip style="visibility: hidden">
+			I'm a tooltip.<br>
+			I appear to the left.<br>
+			<input><br>
+			<button>OK</button>
+		</d-tooltip>
+	</button>
 	
 	<!-- Check that tooltip and connector are positioned properly when tooltip can't be centered above/below anchor -->
-	<my-tooltip-button id="bottom-left" style="position: absolute; bottom: 0; left: 0;" dropDownPosition="above-centered">
-		show above
-	</my-tooltip-button>
+	<button is="d-dropdown-button" id="bottom-left" style="position: absolute; bottom: 0; left: 0;" dropDownPosition="above-centered">
+		<d-label>show above</d-label>
+		<d-tooltip style="visibility: hidden">
+			I'm a tooltip.<br>
+			I appear above, but not centered.<br>
+			<input><br>
+			<button>OK</button>
+		</d-tooltip>
+	</button>
 	
-	<my-tooltip-button id="bottom" style="position: absolute; bottom: 0; left: 45%;" dropDownPosition="above-centered">
-		show above
-	</my-tooltip-button>
+	<button is="d-dropdown-button" id="bottom" style="position: absolute; bottom: 0; left: 45%;" dropDownPosition="above-centered">
+		<d-label>show above</d-label>
+		<d-tooltip style="visibility: hidden">
+			I'm a tooltip.<br>
+			I appear above.<br>
+			<input><br>
+			<button>OK</button>
+		</d-tooltip>
+	</button>
 
 	<!-- Check that tooltip and connector are positioned properly when tooltip can't be centered before/after anchor -->
-	<my-tooltip-button id="bottom-right" style="position: absolute; bottom: 0; right: 0;" dropDownPosition="before-centered after-centered">
-		show to left
-	</my-tooltip-button>
-
-	<d-tooltip id="my-tooltip" style="visibility: hidden">
-		<label for="name">Name:</label> <input id="name"> <br>
-		<label for="age">Age:</label> <input id="age"> <br>
-		<label for="sex">Sex:</label> <input id="sex"> <br><br>
-		<button type="submit">OK</button>
-	</d-tooltip>
+	<button is="d-dropdown-button" id="bottom-right" style="position: absolute; bottom: 0; right: 0;" dropDownPosition="before-centered after-centered">
+		<d-label>show to left</d-label>
+		<d-tooltip style="visibility: hidden">
+			I'm a tooltip.<br>
+			I appear to the left, but not centered.<br>
+			<input><br>
+			<button>OK</button>
+		</d-tooltip>
+	</button>
 </body>
 </html>
