@@ -67,10 +67,12 @@ define([
 			// This could not have been done in orient() since the tooltip wasn't positioned at that time.
 			var aroundNodeCoords = pos.aroundNodePos;
 			if (pos.corner.charAt(0) === "M" && pos.aroundCorner.charAt(0) === "M") {
-				this.connectorNode.style.top = aroundNodeCoords.y + ((aroundNodeCoords.h - this.connectorNode.offsetHeight) >> 1) - pos.y + "px";
+				this.connectorNode.style.top = aroundNodeCoords.y +
+					((aroundNodeCoords.h - this.connectorNode.offsetHeight) >> 1) - pos.y + "px";
 				this.connectorNode.style.left = "";
 			} else if (pos.corner.charAt(1) === "M" && pos.aroundCorner.charAt(1) === "M") {
-				this.connectorNode.style.left = aroundNodeCoords.x + ((aroundNodeCoords.w - this.connectorNode.offsetWidth) >> 1) - pos.x + "px";
+				this.connectorNode.style.left = aroundNodeCoords.x +
+					((aroundNodeCoords.w - this.connectorNode.offsetWidth) >> 1) - pos.x + "px";
 				this.connectorNode.style.top = "";
 			}
 		}
