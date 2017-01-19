@@ -3,7 +3,7 @@
 	<d-linear-layout style="height: 100%">
 		<label class="d-combo-popup-header" for="{{_tag}}-{{widgetId}}-input">{{header}}</label>
 		<input id="{{_tag}}-{{widgetId}}-input"
-			d-hidden="{{!(this.combobox.autoFilter && this.combobox.selectionMode !== 'multiple')}}"
+			d-hidden="{{this.combobox._inputReadOnly}}"
 			attach-point="inputNode"
 			class="d-combobox-input"
 			role="combobox" autocomplete="off" autocapitalize="none" autocorrect="off"

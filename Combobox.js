@@ -398,6 +398,9 @@ define([
 				this.discardComputing();
 			}
 
+			this._inputReadOnly = this.readOnly || !this.autoFilter ||
+				this._isMobile || this.selectionMode === "multiple";
+
 			// Sometimes, especially during creation, the app will specify a value without specifying a displayedValue.
 			// In that case, copy this.value to this.displayedValue.  This code is fragile though; need to make
 			// sure Combobox itself always sets displayedValue at the same time it sets value.
@@ -428,24 +431,20 @@ define([
 
 		/* jshint maxcomplexity: 17 */
 		refreshRendering: function (oldValues) {
-			var updateReadOnly = false;
 			if ("list" in oldValues) {
 				this._initList();
 			}
 			if ("selectionMode" in oldValues) {
-				updateReadOnly = true;
 				if (this.list) {
 					this.list.selectionMode = this.selectionMode === "single" ?
 						"radio" : "multiple";
 				}
 			}
-			if ("autoFilter" in oldValues ||
-				"readOnly" in oldValues) {
-				updateReadOnly = true;
-			}
-			if (updateReadOnly) {
-				this._updateInputReadOnly();
-				this._setSelectable(this.inputNode, !this.inputNode.readOnly);
+			if ("_inputReadOnly" in oldValues) {
+				// Note: We can't put readonly={{_inputReadOnly}} in the template because we need to overrid
+				// when delite/FormWidget sets the <input>'s readonly attribute based on this.readOnly.
+				this.inputNode.readOnly = this._inputReadOnly ? "readonly" : "";
+				this._setSelectable(this.inputNode, !this._inputReadOnly);
 			}
 
 			// Update <input>'s value if necessary, but don't update the value because the user
@@ -459,27 +458,6 @@ define([
 					this._popupInput.value = this.displayedValue;
 				}
 			}
-		},
-
-		/**
-		 * Updates the value of the private property on which the Combobox template
-		 * binds the `readonly` attribute of the input element.
-		 * @private
-		 */
-		_updateInputReadOnly: function () {
-			var oldValue = this._inputReadOnly;
-			this._inputReadOnly = this.readOnly || !this.autoFilter ||
-				this._isMobile || this.selectionMode === "multiple";
-			if (this._inputReadOnly === oldValue) {
-				// FormValueWidget.refreshRendering() mirrors the value of widget.readOnly
-				// to focusNode.readOnly, thus competing with the binding of the readOnly
-				// attribute of the input node (which is also the focusNode attach point)
-				// in the template of Combobox. To ensure the refresh of the binding is done
-				// including when the value of the flag _inputReadOnly doesn't change while
-				// FormValueWidget has reset the attribute to a different value, force
-				// the notification:
-				this.notifyCurrentValue("_inputReadOnly");
-			} // else no need to notify "by hand", rely on automatic notification
 		},
 
 		/**
@@ -623,8 +601,6 @@ define([
 		},
 
 		loadDropDown: function () {
-			this._updateInputReadOnly();
-
 			var dropDown = this._isMobile ?
 				this.createCenteredDropDown() :
 				this.createAboveBelowDropDown();
