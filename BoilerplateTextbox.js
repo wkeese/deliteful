@@ -1,9 +1,11 @@
 /** @module deliteful/BoilerplateTextbox */
 define([
+	"dcl/dcl",
 	"delite/register",
 	"delite/FormValueWidget",
 	"delite/handlebars!./BoilerplateTextbox/BoilerplateTextbox.html"
 ], function (
+	dcl,
 	register,
 	FormValueWidget,
 	template
@@ -11,6 +13,91 @@ define([
 	"use strict";
 
 	// TODO: create Field, NumberField, Delimiter classes to represent fields.
+
+	/**
+	 * Base class for all editable fields and delimiters in a BoilerplateTextbox.
+	 */
+	var Field = dcl(null, {
+		constructor: function (args) {
+			dcl.mix(this, args);
+		},
+
+		/**
+		 * Text to display when field has no value.
+		 * @member {string}
+		 */
+		boilerplate: "",
+
+		/**
+		 * True if the user can edit the field.  False if field is a delimiter.
+		 * @member {boolean}
+		 */
+		editable: true,
+
+		/**
+		 * Value of field, or null if no value is set.
+		 * @member {string}
+		 */
+		value: null,
+
+		/**
+		 * Called when focus moved to this field.
+		 */
+		focusHandler: function () {
+		},
+
+		/**
+		 * Handler for when the user types a character.
+		 * @param {string} char
+		 * @returns {boolean} True if focus should be moved to next field.     `
+		 */
+		inputHandler: function (char) {
+		}
+
+		// TODO: delete key handler
+	});
+
+	/**
+	 * Non-editable field.
+	 */
+	var Delimiter = dcl(Field, {
+		editable: false
+	});
+
+	/**
+	 * Generic number field.
+	 */
+	var NumberField = dcl(Field, {
+		/**
+		 * Number of characters user has typed into this field since it was focused.
+		 */
+		charactersTyped: 0,
+
+		focusHandler: function () {
+			this.charactersTyped = 0;
+		},
+
+		inputHandler: function (char) {
+			if (/[0-9]/.test(char)) {
+				if (this.charactersTyped === 0) {
+					// For the first character the user types, replace the boilerplate text (ex: "yyyy")
+					// with zeros followed by the character the user typed.
+					this.value = "0".repeat(this.boilerplate.length - 1) + char;
+				} else {
+					// Otherwise, slide the other characters over and insert new character at right,
+					// for example if the user types "3" then "0002" is changed to "0023".
+					this.value = this.value.substr(1) + char;
+				}
+
+				this.charactersTyped++;
+			}
+			
+			// Return true if focus should advance to next field.
+			return  this.charactersTyped >= this.boilerplate.length;
+		}
+	});
+
+	// TODO: move to delite?
 	/**
 	 * A base class for TextBoxes like DateTextBox and TimeTextBox that will enforce a specified pattern.
 	 */
@@ -19,6 +106,7 @@ define([
 
 		template: template,
 
+		// TODO: Remove.  Implied by sections[].
 		/**
 		 * The pattern to use like a placeHolder and to enforce what and where the user can type.
 		 * Letters represent where the user can type and other characters (ex: slash) are treated
@@ -28,6 +116,8 @@ define([
 
 		// TODO: maybe subclass needs to define sections[] directly?
 		// TODO: start and length not really needed, they are implied.
+		// TODO: update this if pattern is changed.
+		// TODO: rename to fields[].
 		// { boilerplate: "mm", editable: true,
 		/**
 		 * List of sections of the <input> the user can edit,
@@ -40,17 +130,7 @@ define([
 		/**
 		 * The index of the section that's currently being edited.
 		 */
-		currentSection: 0,
-
-		/**
-		 * Which characters the user is allowed to type.  Others will be ignored.
-		 */
-		acceptedChars: /[0-9]/,
-
-		/**
-		 * Number of characters the user has typed into the current section.
-		 */
-		charactersTypedIntoCurrentSection: 0,
+		currentSectionIndex: -1,
 
 		postRender: function () {
 			this.on("focus", this.focusHandler.bind(this), this.focusNode);
@@ -70,23 +150,24 @@ define([
 				this.sections = [];
 				this.pattern.match(/[a-zA-Z]+|[^a-zA-Z]+/g).forEach(function (match) {
 					if (/[a-zA-Z]+/.test(match)) {
-						this.sections.push({
-							value: match,
+						this.sections.push(new NumberField({
 							boilerplate: match,		// aka initial value
-							boilerplateAfterSection: "",
-							start: pos,
-							length: match.length
-						});
+							start: pos,             // todo: remove?
+							length: match.length             // todo: remove?
+						}));
 					} else {
-						// Note that this code doesn't handle a pattern that starts with boilerplate, like "$XX.YY".
-						this.sections[this.sections.length - 1].boilerplateAfterSection += match;
+						this.sections.push(new Delimiter({
+							boilerplate: match,
+							start: pos,             // todo: remove?
+							length: match.length             // todo: remove?
+						}));
 					}
 					pos += match.length;
 				}, this)
 			}
 
-			if ("currentSection" in oldVals) {
-				this.charactersTypedIntoCurrentSection = 0;
+			if ("currentSectionIndex" in oldVals && this.currentSectionIndex >= 0) {
+				this.sections[this.currentSectionIndex].focusHandler();
 			}
 
 		},
@@ -96,9 +177,9 @@ define([
 				this.focusNode.value = this.value;
 			}
 
-			// TODO: only do this when focused
-			if ("currentSection" in oldVals || "sections" in oldVals || "value" in oldVals) {
-				var currentSection = this.sections[this.currentSection];
+			if (this.currentSectionIndex >= 0 &&
+				("currentSectionIndex" in oldVals || "sections" in oldVals || "value" in oldVals)) {
+				var currentSection = this.sections[this.currentSectionIndex];
 				this.focusNode.setSelectionRange(currentSection.start, currentSection.start + currentSection.length);
 			}
 		},
@@ -110,6 +191,7 @@ define([
 		 * To be used to handle clicks by the user on a certain section.
 		 */
 		getSectionAtPos: function (pos) {
+			// TODO: rewrite
 			var index = 0;
 			while (this.sections[index + 1] && this.sections[index + 1].start <= pos) {
 				index++
@@ -120,50 +202,36 @@ define([
 		focusHandler: function () {
 			// On focus, select the first input section.  User notifyCurrentValue() to trigger processing
 			// even if currentSection was already set to 0.
-			this.currentSection = 0;
-			this.notifyCurrentValue("currentSection");
+			this.currentSectionIndex = 0;
+			this.notifyCurrentValue("currentSectionIndex");
 		},
 
 		keydownHandler: function (evt) {
-			if (!this.acceptedChars.test(evt.key)) {
-				return;
-			}
-
 			// Handle all keystrokes programatically.
 			evt.preventDefault();
-			var currentSection = this.sections[this.currentSection];
+			var currentSection = this.sections[this.currentSectionIndex];
 
-			// TODO: character handling needs to be customizable because for TimePicker am/pm section
-			// handing is different (allowed characters, response after first character, etc.)
-			if (this.charactersTypedIntoCurrentSection === 0) {
-				// For the first character the user types, replace the boilerplate text (ex: "yyyy")
-				// with zeros followed by the character the user typed.
-				// TODO: hmm, currentSection.value will be wrong if this.value is changed externally.
-				currentSection.value = "0".repeat(currentSection.length - 1) + evt.key;
-			} else {
-				// Otherwise, slide the other characters over and insert new character at right,
-				// for example if the user types "3" then "0002" is changed to "0023".
-				currentSection.value = currentSection.value.substr(1) + evt.key;
+			// TODO: delete key should restore to boilerplate text.
+			// TODO: handle tab and shift-tab between fields and leaving control completely
+
+			// Send keystroke to current field.
+			var advance = currentSection.inputHandler(evt.key);
+
+			if (advance) {
+				// User has finished typing this field so go to next field, if there is one.
+				for (var csn = this.currentSectionIndex + 1; csn < this.sections.length; csn++) {
+					if (this.sections[csn].editable ) {
+						this.currentSectionIndex = csn;
+						break;
+					}
+				}
 			}
 
 			this.value = this.sections.map(function (section) {
-				return section.value + section.boilerplateAfterSection;
+				return section.value || section.boilerplate;
 			}).join("");
-
-			this.charactersTypedIntoCurrentSection++;
-			if (this.charactersTypedIntoCurrentSection >= this.currentSection.length) {
-				// User has finished typing this section so go to next section.
-				this.currentSection++;
-			}
-
-			// Apparently calling code wants a change event on every keystroke.
-			this.emit("change", {
-				value: this.value
-			});
 		}
 
-		// TODO: delete key should restore to boilerplate text.
-		// TODO: handle tab and shift-tab between fields and leaving control completely
 		// TODO: handle when TextBox is already focused and user clicks a different section.
 	});
 });
