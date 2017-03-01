@@ -1,10 +1,12 @@
-/** @module deliteful/BoilerplateTextBox */
+/** @module deliteful/BoilerplateTextbox */
 define([
 	"delite/register",
-	"delite/Widget"
+	"delite/FormValueWidget",
+	"delite/handlebars!./BoilerplateTextbox/BoilerplateTextbox.html"
 ], function (
 	register,
-	Widget
+	FormValueWidget,
+	template
 ) {
 	"use strict";
 
@@ -12,8 +14,10 @@ define([
 	/**
 	 * A base class for TextBoxes like DateTextBox and TimeTextBox that will enforce a specified pattern.
 	 */
-	return register("d-boilerplate-textbox", [HTMLElement, Widget], {
-		value: "",
+	return register("d-boilerplate-textbox", [HTMLElement, FormValueWidget], {
+		baseClass: "d-boilerplate-textbox",
+
+		template: template,
 
 		/**
 		 * The pattern to use like a placeHolder and to enforce what and where the user can type.
@@ -49,15 +53,8 @@ define([
 		charactersTypedIntoCurrentSection: 0,
 
 		postRender: function () {
-			this.on("focus", this.focusHandler.bind(this));
-			this.on("keydown", this.keydownHandler.bind(this));
-
-			// Helper for directly testing this class.
-			// TODO: Extend FormValueWidget and create template
-			if (!this.focusNode) {
-				this.focusNode = this.appendChild(this.ownerDocument.createElement("input"));
-				this.focusNode.id = (this.id || this.widgetId) + "-input";
-			}
+			this.on("focus", this.focusHandler.bind(this), this.focusNode);
+			this.on("keydown", this.keydownHandler.bind(this), this.focusNode);
 		},
 
 		computeProperties: function (oldVals) {
