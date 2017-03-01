@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta name="viewport"
+		  content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+
+	<title>BoilerplateTextbox functional test</title>
+
+	<!-- For testing purposes. Real applications should load the AMD loader directly -->
+	<script type="text/javascript" src="../boilerplate.js"></script>
+	
+	<script type="text/javascript">
+		var ready = false; // set to true when the test page is ready
+		require(["delite/register", "deliteful/BoilerplateTextbox", "requirejs-domready/domReady!"],
+			function (register) {
+				register.deliver();
+				ready = true;
+			}
+		);
+	</script>
+</head>
+<body>
+	<h1>BoilerplateTextbox functional test</h1>
+
+	<label for="bt1-input">Date</label>:
+	<d-boilerplate-textbox id="bt1" pattern="mm/dd/yyyy"></d-boilerplate-textbox>
+	<br><br>
+
+	<label for="bt2-input">Date with initial value</label>:
+	<d-boilerplate-textbox id="bt2" pattern="mm/dd/yyyy" value="07/04/2008"></d-boilerplate-textbox>
+	<br><br>
+
+	<label for="bt3-input">Time</label>:
+	<d-boilerplate-textbox id="bt3" pattern="hh:mm:ss am"></d-boilerplate-textbox>
+	<br><br>
+
+</body>
