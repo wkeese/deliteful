@@ -22,68 +22,70 @@ define([
 					intern.config.WAIT_TIMEOUT, intern.config.POLL_INTERVAL));
 		},
 
-		beforeEach: function () {
+		afterEach: function () {
 			return this.remote
-				.findById("reset").click().end()	// set BoilerplateTextboxes to original values
-				.findById("pi").click().end();		// focus on <input> before BoilerplateTextboxes
+				.findById("reset").click().end()		// set BoilerplateTextboxes to original values
+				.execute("resetToOriginalValues();")	// hmm, above doesn't do anything, at least on chrome
+				.findById("pi").click().end();			// focus on <input> before BoilerplateTextboxes
+		},
+
+		"initial conditions": function () {
+			return this.remote
+				.execute("return document.querySelector('[name=date1]').value;").then(function (value) {
+					assert.strictEqual(value, "", "dt1 initial value");
+				})
+				.execute("return document.querySelector('[name=date2]').value;").then(function (value) {
+					assert.strictEqual(value, "07/04/2008", "dt2 initial value");
+				});
 		},
 
 		basic: function () {
 			return this.remote
-				.findById("dt1-input").click().end()
+				.findByCssSelector("#dt1 .d-input-container-node input").click().end()
 				.execute("return state(dt1);").then(function (v) {
 					assert.deepEqual(v, {
 						value: "",
 						displayed: "mm/dd/yyyy",
-						selection: [0, 2]
+						focused: "month"
 					}, "mm selected");
 				})
-				.execute("dt1.emit('keydown', {key: '1'}, dt1.focusNode);")
+				.execute("dt1.emit('keydown', {key: '1'}, document.activeElement);")
 				.execute("return state(dt1);").then(function (v) {
 					assert.deepEqual(v, {
 						value: "",
 						displayed: "01/dd/yyyy",
-						selection: [0, 2]
+						focused: "month"
 					}, "mm selected, 1 typed");
 				})
-				.execute("dt1.emit('keydown', {key: '2'}, dt1.focusNode);")
+				.execute("dt1.emit('keydown', {key: '2'}, document.activeElement);")
 				.execute("return state(dt1);").then(function (v) {
 					assert.deepEqual(v, {
 						value: "",
 						displayed: "12/dd/yyyy",
-						selection: [3, 5]
+						focused: "day"
 					}, "focus automatically moves to next field");
 				})
-				.execute("dt1.emit('keydown', {key: '3'}, dt1.focusNode);")
+				.execute("dt1.emit('keydown', {key: '0'}, document.activeElement);")
+				.execute("dt1.emit('keydown', {key: '3'}, document.activeElement);")
 				.execute("return state(dt1);").then(function (v) {
 					assert.deepEqual(v, {
 						value: "",
 						displayed: "12/03/yyyy",
-						selection: [3, 5]
-					}, "3 typed");
+						focused: "year"
+					}, "03 typed");
 				})
-				.execute("dt1.emit('keydown', {key: 'Tab'}, dt1.focusNode);")
-				.execute("return state(dt1);").then(function (v) {
-					assert.deepEqual(v, {
-						value: "",
-						displayed: "12/03/yyyy",
-						selection: [6, 10]
-					}, "tab skips to next field");
+				.execute("return document.querySelector('[name=date1]').value;").then(function (value) {
+					assert.strictEqual(value, "", "only partial input so no hidden value yet");
+				}).end()
+				.execute("dt1.emit('keydown', {key: '2'}, document.activeElement);")
+				.execute("dt1.emit('keydown', {key: '0'}, document.activeElement);")
+				.execute("dt1.emit('keydown', {key: '1'}, document.activeElement);")
+				.execute("dt1.emit('keydown', {key: '7'}, document.activeElement);")
+				.execute("return document.querySelector('[name=date1]').value;").then(function (value) {
+					assert.strictEqual(value, "12/03/2017", "hidden value finally set");
 				})
-				.execute("dt1.emit('keydown', {key: '2'}, dt1.focusNode);")
-				.execute("dt1.emit('keydown', {key: '0'}, dt1.focusNode);")
-				.execute("dt1.emit('keydown', {key: '1'}, dt1.focusNode);")
-				.execute("dt1.emit('keydown', {key: '7'}, dt1.focusNode);")
-				.execute("return document.activeElement.id;").then(function (id) {
-					assert.strictEqual(id, "dt1-input", "focus still on dt1");
-				})
-				.execute("dt1.emit('keydown', {key: 'Tab', shiftKey: true}, dt1.focusNode);")
-				.execute("return state(dt1);").then(function (v) {
-					assert.deepEqual(v, {
-						value: "12/03/2017",
-						displayed: "12/03/2017",
-						selection: [3, 5]
-					}, "shift-tab goes back to previous field");
+				.execute("return document.activeElement.className;").then(function (name) {
+					assert.strictEqual(name, "year", "focus still on dt1");
 				});
 		},
 
@@ -94,6 +96,9 @@ define([
 
 			return this.remote
 				.findById("pi").click().end()
+				.execute("return document.getElementById('dt1-change-events').value;").then(function (count) {
+					assert.strictEqual(count, "0", "no change events to start");
+				})
 				.pressKeys(keys.TAB)
 				.execute("return document.activeElement.id;").then(function (id) {
 					assert.strictEqual(id, "dt1-input", "tab into dt1");
@@ -102,28 +107,37 @@ define([
 					assert.deepEqual(v, {
 						value: "",
 						displayed: "mm/dd/yyyy",
-						selection: [0, 2]
+						focused: "month"
 					}, "mm selected");
 				})
-				.execute("dt1.emit('keydown', {key: 'Tab'}, dt1.focusNode);")
+				.execute("dt1.emit('keydown', {key: '1'}, document.activeElement);")
+				.pressKeys(keys.TAB)
 				.execute("return state(dt1);").then(function (v) {
 					assert.deepEqual(v, {
 						value: "",
-						displayed: "mm/dd/yyyy",
-						selection: [3, 5]
+						displayed: "01/dd/yyyy",
+						focused: "day"
 					}, "dd selected");
 				})
-				.execute("dt1.emit('keydown', {key: 'Tab'}, dt1.focusNode);")
+				.execute("dt1.emit('keydown', {key: '2'}, document.activeElement);")
+				.pressKeys(keys.TAB)
 				.execute("return state(dt1);").then(function (v) {
 					assert.deepEqual(v, {
 						value: "",
-						displayed: "mm/dd/yyyy",
-						selection: [6, 10]
+						displayed: "01/02/yyyy",
+						focused: "year"
 					}, "yyyy selected");
+				})
+				.execute("dt1.emit('keydown', {key: '3'}, document.activeElement);")
+				.execute("return document.getElementById('dt1-change-events').value;").then(function (count) {
+					assert.strictEqual(count, "0", "no change events until blur");
 				})
 				.pressKeys(keys.TAB)
 				.execute("return document.activeElement.id;").then(function (id) {
 					assert.strictEqual(id, "dt2-input", "tab out of dt1");
+				})
+				.execute("return document.getElementById('dt1-change-events').value;").then(function (count) {
+					assert.strictEqual(count, "1", "one change event on blur");
 				});
 		},
 
@@ -151,35 +165,70 @@ define([
 					assert.deepEqual(v, {
 						value: "07/04/2008",
 						displayed: "07/04/2008",
-						selection: [0, 2]
+						focused: "month"
 					}, "month selected");
 				})
-				.execute("dt2.emit('keydown', {key: 'Backspace'}, dt2.focusNode);")
+				.execute("dt2.emit('keydown', {key: 'Backspace'}, document.activeElement);")
 				.execute("return state(dt2);").then(function (v) {
 					assert.deepEqual(v, {
 						value: "",
 						displayed: "mm/04/2008",
-						selection: [0, 2]
+						focused: "month"
 					}, "month cleared");
 				})
-				.execute("dt2.emit('keydown', {key: '9'}, dt2.focusNode);")
+				.execute("dt2.emit('keydown', {key: '9'}, document.activeElement);")
 				.execute("return state(dt2);").then(function (v) {
 					assert.deepEqual(v, {
 						value: "09/04/2008",
 						displayed: "09/04/2008",
-						selection: [0, 2]
+						focused: "month"
 					}, "month partially typed");
 				})
-				.execute("dt2.emit('keydown', {key: 'Backspace'}, dt2.focusNode);")
+				.execute("dt2.emit('keydown', {key: 'Backspace'}, document.activeElement);")
 				.execute("return state(dt2);").then(function (v) {
 					assert.deepEqual(v, {
 						value: "",
 						displayed: "mm/04/2008",
-						selection: [0, 2]
+						focused: "month"
 					}, "month cleared again");
 				});
-		}
+		},
 
-		// TODO: if possible, after element is focused and selection is "mm", test clicking "yyyy" to move focus there.
+		clicking: {
+			"click on year": function () {
+				return this.remote
+					.findByCssSelector("#dt1 .d-input-container-node input:last-child").click().end()
+					.execute("return state(dt1);").then(function (v) {
+						assert.deepEqual(v, {
+							value: "",
+							displayed: "mm/dd/yyyy",
+							focused: "month"
+						}, "clicked on year but month was selected because it's the initial click on the widget");
+					})
+					.findByCssSelector("#dt1 .d-input-container-node input:last-child").click().end()
+					.execute("return state(dt1);").then(function (v) {
+						assert.deepEqual(v, {
+							value: "",
+							displayed: "mm/dd/yyyy",
+							focused: "year"
+						}, "second click on day goes to year");
+					});
+			},
+
+			"click on slash": function () {
+				if (this.remote.environmentType.platformName === "iOS") {
+					return this.skip("doesn't work on mobile, I guess you can't programatically shift focus?");
+				}
+				return this.remote
+					.findByCssSelector("#dt2 d-btb-boilerplate").click().end()
+					.execute("return state(dt2);").then(function (v) {
+						assert.deepEqual(v, {
+							value: "07/04/2008",
+							displayed: "07/04/2008",
+							focused: "month"
+						}, "clicked on slash but month was selected because it's the initial click on the widget");
+					})
+			}
+		}
 	});
 });

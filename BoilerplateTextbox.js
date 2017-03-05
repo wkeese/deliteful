@@ -1,93 +1,84 @@
 /** @module delite/BoilerplateTextbox */
 define([
-	"dcl/dcl",
-	"./FormValueWidget",
-	"./handlebars!./BoilerplateTextbox/BoilerplateTextbox.html"
+	"delite/register",
+	"delite/Container",
+	"delite/FormValueWidget",
+	"delite/Widget",
+	"delite/handlebars!./BoilerplateTextbox/BoilerplateTextbox.html",
+	"requirejs-dplugins/jquery!attributes/classes",
+	"delite/activationTracker",
+	"delite/theme!./BoilerplateTextbox/themes/{{theme}}/BoilerplateTextbox.css"
 ], function (
-	dcl,
+	register,
+	Container,
 	FormValueWidget,
-	template
+	Widget,
+	template,
+	$
 ) {
 	"use strict";
 
 	/**
 	 * Non-editable section, boilerplate text.
+	 *
+	 * Creator should set:
+	 *
+	 * - textContent
 	 */
-	var Boilerplate = dcl(null, {
-		constructor: function (args) {
-			dcl.mix(this, args);
-		},
-
-		/**
-		 * Value of field.
-		 * @member {string}
-		 */
-		value: "",
-
-		/**
-		 * True if this is a field the user can edit.  False if it's boilerplate text.
-		 * @member {boolean}
-		 */
-		editable: false
-	});
+	var Boilerplate = register("d-btb-boilerplate", [HTMLElement, Widget], {});
 
 	/**
 	 * Base class for editable fields in a BoilerplateTextbox.
+	 *
+	 * Creator should set the following properties/attributes:
+	 *
+	 * - value
+	 * - placeholder
+	 * - aria-label
+	 *
+	 * Emits "completed" event if caret should automatically move to next element.
 	 */
-	var Field = dcl(Boilerplate, {
-		editable: true,
-
-		/**
-		 * Text to display when section has no value.
-		 * @member {string}
-		 */
-		boilerplate: "",
-
-		/**
-		 * Called when focus moved to this field.
-		 */
-		focus: function () {
-		},
-
-		/**
-		 * Handler for when the user presses delete key, to restore field to boilerplate text.
-		 */
-		clear: function () {
-		},
-
-		/**
-		 * Handler for when the user types a character.
-		 * @param {string} char
-		 * @returns {boolean} True if focus should be moved to next field.     `
-		 */
-		type: function () {
-		}
+	var Field = register("d-btb-field", [HTMLInputElement, Widget], {
 	});
 
 	/**
 	 * Generic number field.
 	 */
-	var NumberField = dcl(Field, {
+	var NumberField = register("d-btb-number-field", [Field], {
 		/**
 		 * Number of characters user has typed into this field since it was focused.
 		 */
 		charactersTyped: 0,
 
-		focus: function () {
-			this.charactersTyped = 0;
+		createdCallback: function () {
+			this.on("focus", this.focusHandler.bind(this));
+			this.on("keydown", this.keydownHandler.bind(this));
 		},
 
-		clear: function () {
-			delete this.value;
+		focusHandler: function () {
 			this.charactersTyped = 0;
+			if (this.value) {
+				this.setSelectionRange(0, this.value.length);
+			}
 		},
 
-		type: function (char) {
-			if (/[0-9]/.test(char)) {
+		keydownHandler: function (evt) {
+			var char = evt.key;
+
+			if (char === "Tab") {
+				// Let tab and shift-tab be handled by the browser.
+				return;
+			}
+
+			if (char === "Delete" || char === "Backspace") {
+				this.value = "";
+				this.charactersTyped = 0;
+				this.emit("input");
+			} else if (/[0-9]/.test(char)) {
 				if (this.charactersTyped === 0) {
 					// For the first character the user types, replace the boilerplate text (ex: "yyyy")
 					// with zeros followed by the character the user typed.
-					this.value = (new Array(this.boilerplate.length)).join("0") + char;
+					this.value = (new Array(this.placeholder.length)).join("0") + char;
 				} else {
 					// Otherwise, slide the other characters over and insert new character at right,
 					// for example if the user types "3" then "0002" is changed to "0023".
@@ -95,193 +86,159 @@ define([
 				}
 
 				this.charactersTyped++;
+				this.setSelectionRange(0, this.value.length);
+				this.emit("input");
+
+				// Send "completed" event if focus should automatically move to next field.
+				if (this.charactersTyped >= this.placeholder.length) {
+					this.emit("completed");
+				}
 			}
 
-			// Return true if focus should advance to next field.
-			return  this.charactersTyped >= this.boilerplate.length;
+			evt.preventDefault();
 		}
 	});
 
 	/**
-	 * A base class for Textboxes like DateTextbox and TimeTextbox that will enforce a specified pattern.
+	 * A replacement for an `<input>` that enforces a certain pattern by having editable areas separated
+	 * by boilerplate text.
+	 *
+	 * The editable areas and boilerplate text are children of this widget and must exist by the time
+	 * `render()` completes.
 	 */
-	var BoilerplateTextbox = dcl([FormValueWidget], {
+	var BoilerplateTextbox = register("d-boilerplate-textbox", [HTMLElement, Container, FormValueWidget], {
 		baseClass: "d-boilerplate-textbox",
 
 		template: template,
 
-		/**
-		 * List of sections of the <input> the user can edit and the un-editable boilerplate text.
-		 * @member {BoilerplateTextbox.Section[]}
-		 */
-		sections: [],
+		// Initially set tabStops --> containerNode so that the aria-labelledby attribute gets
+		// moved there (courtesy of FormWidget).  Later on it's changed to point to all the
+		// nested <input> nodes.
+		tabStops: "containerNode",
+
+		createdCallback: function () {
+			this.on("delite-activated", this.activatedHandler.bind(this));
+			this.on("delite-deactivated", this.deactivatedHandler.bind(this));
+		},
+
+		postRender: function () {
+			this.on("input", this.nestedInputHandler.bind(this), this.containerNode);
+			this.on("change", this.nestedChangeHandler.bind(this), this.containerNode);
+			this.on("completed", this.completedHandler.bind(this), this.containerNode);
+
+			// Change tabStops to point to all the <input> nodes so that FormWidget#refreshRendering()
+			// sets tabIndex, disabled, and readonly properties on those <input> nodes.
+			var inputs = [].slice.call(this.containerNode.querySelectorAll("input"));
+			var tabStops = [];
+			inputs.forEach(function (input) {
+				this["field" + tabStops.length] = input;
+				tabStops.push("field" + tabStops.length);
+			}, this);
+			this.tabStops = tabStops.join(",");
+		},
+
+		attachedCallback: function () {
+			// Set width of each <input>.
+			var cn = this.characterWidthMeasureNode;
+			var inputs = [].slice.call(this.containerNode.querySelectorAll("input"));
+			inputs.forEach(function (input) {
+				if (input.placeholder) {
+					// Set width to maximum of width of placeholder or width of all zeros.
+					cn.textContent = input.placeholder;
+					var width1 = cn.offsetWidth;
+					cn.textContent = input.placeholder.replace(/./g, "0");
+					var width2 = cn.offsetWidth;
+					input.style.width = Math.max(width1, width2) + "px";
+				}
+			}, this);
+		},
 
 		/**
-		 * The index of the section that's currently being edited.
+		 * Set values of `<input>` nodes according to specified value.
+		 * String must exactly match formatting of `<input>` placeholder text
+		 * combined with boilerplate text.
+		 * @param value
 		 */
-		currentSectionIndex: -1,
-
-		/**
-		 * True if the BoilerplateTextbox was just focused.
-		 */
-		justFocused: false,
-
-		/**
-		 * The value is only stored split up in `sections[]` but the `value` property
-		 * is an alternate interface to set/get the value.
-		 */
-		value: "",
-		_setValueAttr: function (value) {
-			// Simple code to set section values according to single string.
-			// String must exactly match formatting of boilerplate text.
+		setInputValues: function (value) {
 			var start = 0;
-			this.sections.forEach(function (section) {
-				var length = (section.boilerplate || section.value).length;
-				if (section.editable) {
-					section.value = value ? value.substr(start, length) : null;
+			Array.prototype.forEach.call(this.containerNode.children, function (section) {
+				var length = (section.placeholder || section.textContent).length;
+				if ("value" in section) {
+					section.value = value ? value.substr(start, length) : "";
 				}
 				start += length;
 			});
-			this.notifyCurrentValue("sections");
 		},
-		_getValueAttr: function () {
+
+		refreshRendering: function (oldVals) {
+			if ("value" in oldVals && !this.processingUserInput) {
+				this.setInputValues(this.value);
+			}
+		},
+
+		activatedHandler: function (evt) {
+			// When the BoilerplateTextbox gets focus, focus the first <input>.
+			this.defer(function () {
+				this.containerNode.querySelector("input").focus();
+			});
+			$(this).addClass("d-focused");
+		},
+
+		deactivatedHandler: function (evt) {
+			// When the BoilerplateTextbox loses focus, fire the "change" event.
+			this.handleOnChange(this.value);
+			$(this).removeClass("d-focused");
+		},
+
+		/**
+		 * Get value of widget according to values of nested `<input>` nodes.
+		 * @returns {*}
+		 */
+		getValue: function () {
 			// Return concatenated values of fields.
-			// If none of the fields have values then return "".
-			// Unclear what to return when some (but not all) of the fields have values.
-			if (this.sections.every(function (section) { return section.value || !section.editable; })) {
-				return this.sections.map(function (section) {
-					return section.value || section.boilerplate;
+			// If any of the fields are unset then return "".
+			var sections = [].slice.call(this.containerNode.children);
+			if (sections.every(function (section) { return section.value || section.textContent; })) {
+				return sections.map(function (section) {
+					return section.value || section.textContent;
 				}).join("");
 			} else {
 				return "";
 			}
 		},
 
-		postRender: function () {
-			this.on("focus", this.focusHandler.bind(this), this.focusNode);
-			this.on("keydown", this.keydownHandler.bind(this), this.focusNode);
-			this.on("click", this.clickHandler.bind(this), this.focusNode);
-		},
+		/**
+		 * Handler for when user types into one of the nested `<input>`'s.
+		 * @param evt
+		 */
+		nestedInputHandler: function (evt) {
+			evt.stopPropagation();
 
-		refreshRendering: function (oldVals) {
-			if ("sections" in oldVals) {
-				this.focusNode.value = this.sections.map(function (section) {
-					return section.value || section.boilerplate;
-				}).join("");
-			}
-
-			if ("currentSectionIndex" in oldVals && this.currentSectionIndex >= 0) {
-				this.sections[this.currentSectionIndex].focus();
-			}
-
-			if (this.currentSectionIndex >= 0 && ("currentSectionIndex" in oldVals || "sections" in oldVals)) {
-				// Compute starting position of current section.
-				var start = 0;
-				for (var i = 0; i < this.currentSectionIndex; i++) {
-					start += (this.sections[i].value || this.sections[i].boilerplate).length;
-				}
-
-				// Select text of current section.
-				var currentSection = this.sections[this.currentSectionIndex],
-					text = currentSection.value || currentSection.boilerplate;
-				this.focusNode.setSelectionRange(start, start + text.length);
-			}
-		},
-
-		focusHandler: function () {
-			this.justFocused = true;
-
-			// On focus, select the first input section.
-			// Note: On IE, firefox, and safari you need a delay after focus before setting selection.
+			this.processingUserInput = true;
 			this.defer(function () {
-				this.currentSectionIndex = 0;
+				this.processingUserInput = false;
+			}, 1);
 
-				// Use notifyCurrentValue() to trigger processing even if currentSection was already set to 0.
-				this.notifyCurrentValue("currentSectionIndex");
-
-				this.defer(function () {
-					this.justFocused = false;
-				}, 100);
-			});
+			this.handleOnInput(this.getValue());
 		},
 
 		/**
-		 * Handler for tab and shift-tab.
-		 * @param shift - True if user pressed shift-tab, false if user just pressed tab.
-		 * @returns {boolean} True if tab was handled internally, false if browser should handle it.
+		 * Handler for when nested `<input>` emits a "change" event.
+		 * @param evt
 		 */
-		tabHandler: function (shift) {
-			var csn;
-			if (shift) {
-				for (csn = this.currentSectionIndex - 1; csn >= 0; csn--) {
-					if (this.sections[csn].editable) {
-						this.currentSectionIndex = csn;
-						return true;
-					}
-				}
-			} else {
-				for (csn = this.currentSectionIndex + 1; csn < this.sections.length; csn++) {
-					if (this.sections[csn].editable) {
-						this.currentSectionIndex = csn;
-						return true;
-					}
-				}
-			}
-
-			// Signal that tab should be handled by browser.
-			return false;
+		nestedChangeHandler: function (evt) {
+			evt.stopPropagation();
 		},
 
-		keydownHandler: function (evt) {
-			// Handle all keystrokes programatically.
-			var currentSection = this.sections[this.currentSectionIndex];
-
-			if (evt.key === "Delete" || evt.key === "Backspace") {
-				currentSection.clear();
-				this.notifyCurrentValue("sections");
-				this.deliver();
-				evt.preventDefault();
-			} else if (evt.key === "Tab") {
-				// Either move to another section or move out of the BoilerplateTextbox competely.
-				var handled = this.tabHandler(evt.shiftKey);
-				if (handled) {
-					this.deliver();
-					evt.preventDefault();
-				}
-			} else {
-				// Send keystroke to current field.
-				var advance = currentSection.type(evt.key);
-				this.notifyCurrentValue("sections");
-
-				if (advance) {
-					// User has finished typing this field so go to next field, if there is one.
-					for (var csn = this.currentSectionIndex + 1; csn < this.sections.length; csn++) {
-						if (this.sections[csn].editable) {
-							this.currentSectionIndex = csn;
-							break;
-						}
-					}
-				}
-
-				this.deliver();
-
-				evt.preventDefault();
-			}
-		},
-
-		clickHandler: function () {
-			if (!this.justFocused) {
-				// Figure out which editable field was clicked, and focus it.
-				var start = 0;
-				for (var i = 0; i < this.sections.length; i++) {
-					var section = this.sections[i],
-						end = start + (section.value || section.boilerplate).length;
-					if (section.editable && this.focusNode.selectionStart <= end) {
-						this.currentSectionIndex = i;
-						break;
-					}
-					start = end;
-				}
+		/**
+		 * Handler for when a nested `<input>` declares that user has finished setting the value.
+		 * Advances to the next `<input>` if there is one.
+		 */
+		completedHandler: function (evt) {
+			var inputs = [].slice.call(this.containerNode.querySelectorAll("input"));
+			var nextIdx = inputs.indexOf(evt.target) + 1;
+			if (nextIdx < inputs.length) {
+				inputs[nextIdx].focus();
 			}
 		}
 	});
