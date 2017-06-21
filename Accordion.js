@@ -50,7 +50,7 @@ define([
 	 * @class module:deliteful/Accordion
 	 * @augments module:delite/DisplayContainer
 	 */
-	return register("d-accordion", [HTMLElement, DisplayContainer, KeyNav], /** @lends module:deliteful/Accordion# */ {
+	return register("d-accordion", [HTMLElement, DisplayContainer], /** @lends module:deliteful/Accordion# */ {
 		/**
 		 * The name of the CSS class of this widget.
 		 * @member {string}
@@ -118,21 +118,8 @@ define([
 					this._panelList.push(this._setupUpgradedChild(panels[i]));
 				}
 			}
-		},
 
-		postRender: function () {
-			this.setAttribute("role", "tablist");
-			this.setAttribute("aria-multiselectable", "false");
 			this.on("delite-remove-child", this._onRemoveChild.bind(this));
-		},
-
-		/**
-		 * Handle a mouse click or touch on a panel header.
-		 * @param event
-		 * @private
-		 */
-		_headerClickHandler: function (event) {
-			this.activatePanel(event.currentTarget.panel);
 		},
 
 		/**
@@ -166,21 +153,25 @@ define([
 		_setupUpgradedChild: function (panel) {
 			// Create the header (that displays the panel's title).
 			var header = this.createHeader(panel, {
-				id: panel.id + "_panelHeader",
+				id: panel.id + "-header",
 				label: panel.label,
 				openIconClass: panel.openIconClass || this.openIconClass,
 				closedIconClass: panel.closedIconClass || this.closedIconClass,
-				panel: panel
+				panelId: panel.id
 			});
-			header.setAttribute("tabindex", "-1");
-			header.setAttribute("role", "tab");
-			header.setAttribute("aria-expanded", "false");
-			header.setAttribute("aria-selected", "false");
-			header.on("click", this._headerClickHandler.bind(this));
+
+			// Make click on header button open panel.  Alternately, AccordionHeader
+			// could emit "toggle-panel" event or something like that.
+			this.on("click", function (event) {
+				event.stopPropagation();
+				event.preventDefault();
+				this.activatePanel(panel);
+			}.bind(this), header.focusNode);
+
 			header.placeAt(panel, "before");
 
 			// React to programmatic changes on the panel to update the header.
-			panel.observe(function (oldValues) {
+			header.own(panel.observe(function (oldValues) {
 				if ("label" in oldValues) {
 					header.label = panel.label;
 				}
@@ -190,12 +181,12 @@ define([
 				if ("closedIconClass" in oldValues) {
 					header.closedIconClass = panel.closedIconClass;
 				}
-			});
+			}));
 
 			// And set up the panel itself.
 			setVisibility(panel, false);
 			panel.open = false;
-			panel.setAttribute("role", "tabpanel");
+			panel.setAttribute("role", "region");
 			panel.setAttribute("aria-labelledby", header.labelNode.id);
 			panel.setAttribute("aria-hidden", "true");
 			panel.headerNode = header;
@@ -226,18 +217,18 @@ define([
 		getChildren: function () {
 			// Override getChildren() to only return the panels, not the headers
 			return Array.prototype.filter.call(this.children, function (element) {
-				return element.getAttribute("role") === "tabpanel";
+				return element.getAttribute("role") === "region";
 			});
 		},
 
 		getHeaders: function () {
 			return Array.prototype.filter.call(this.children, function (element) {
-				return element.getAttribute("role") === "tab";
+				return element.getAttribute("role") === "heading";
 			});
 		},
 
-		/* jshint maxcomplexity: 14 */
 		refreshRendering: function (props) {
+			/* jshint maxcomplexity: 14 */
 			if ("selectedChildId" in props && this.selectedChildId) {
 				var childNode = this.ownerDocument.getElementById(this.selectedChildId);
 				if (childNode) {
@@ -276,7 +267,6 @@ define([
 				}.bind(this));
 			}
 			if ("mode" in props) {
-				this.setAttribute("aria-multiselectable", this.mode === accordionModes.multipleOpen);
 				if (this.mode === accordionModes.singleOpen) {
 					this._showOpenPanel();
 					this._panelList.forEach(function (panel) {
@@ -287,7 +277,6 @@ define([
 				}
 			}
 		},
-		/* jshint maxcomplexity: 10 */
 
 		_useAnimation: function () {
 			return (this.animate && (function () {
@@ -377,14 +366,7 @@ define([
 			if (valid) {
 				promises.push(this._doTransition(widget, params));
 				// Update WAI-ARIA attributes.
-				widget.headerNode.setAttribute("aria-selected", "" + widget.open);
-				widget.headerNode.setAttribute("aria-expanded", "" + widget.open);
 				widget.setAttribute("aria-hidden", "" + !widget.open);
-				if (params.hide) {
-					widget.headerNode.removeAttribute("aria-controls");
-				} else {
-					widget.headerNode.setAttribute("aria-controls", widget.id);
-				}
 			}
 			return Promise.all(promises);
 		},
@@ -475,12 +457,12 @@ define([
 		// To get to the other focusable fields, user should use the tab key.
 		// By default, only the header itself is focusable.  If a subclass makes
 		// elements inside the header focusable, then it should change descendantSelector.
-		descendantSelector: "[role=tab]",
+		descendantSelector: "[role=heading] button[aria-controls], [role=heading] [role=button][aria-controls]",
 
 		_getCurrentHeader: function () {
 			var node = this.navigatedDescendant;
 			while (node && node !== this) {
-				if (node.getAttribute("role") === "tab") {
+				if (node.getAttribute("role") === "heading") {
 					return node;
 				}
 				node = node.parentElement;
@@ -498,7 +480,7 @@ define([
 				var headers = this.getHeaders();
 				var idx = headers.indexOf(focusedHeader),
 					newIdx = (idx + headers.length + offset) % headers.length;
-				this.navigateTo(headers[newIdx]);
+				this.navigateTo(headers[newIdx].focusNode);
 			}
 		},
 
@@ -518,27 +500,11 @@ define([
 			this._switchHeader(1);
 		},
 
-		spacebarKeyHandler: function () {
-			var focusedHeader = this._getCurrentHeader();
-			this.activatePanel(focusedHeader.panel);
-		},
-
-		enterKeyHandler: function () {
-			var focusedHeader = this._getCurrentHeader();
-			this.activatePanel(focusedHeader.panel);
-		},
-
 		focus: function () {
-			// Navigate to the header for the first open panel, or if no open panels, then the first header.
+			// Navigate to first header, regardless of which panels are open.
+			// Seems to be what Aria 1.1 Accordion spec implies.
 			var header = this.children[0];
-			for (var i = 0; i < this.children.length; i++) {
-				if (this.children[i].open) {
-					header = this.children[i];
-					break;
-				}
-			}
-
-			this.navigateTo(header);
+			this.navigateTo(header.focusNode || header);
 		}
 	});
 });
