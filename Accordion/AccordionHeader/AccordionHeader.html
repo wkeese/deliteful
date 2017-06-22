@@ -1,5 +1,5 @@
 <template role="heading" aria-level="3" class="{{this.open ? 'd-open' : ''}}">
-	<button aria-expanded="{{open}}" aria-controls="{{panelId}}" attach-point="focusNode">
+	<button aria-expanded="{{open}}" aria-controls="{{panelId}}" attach-point="focusNode" aria-labelledby="{{widgetId}}_label">
 		<span role="presentation" attach-point="iconNode"
 			  class="d-icon {{this.open ? this.openIconClass : this.closedIconClass}}"></span>
 		<span attach-point="labelNode" id="{{widgetId}}_label" class="d-label">{{label}}</span>
