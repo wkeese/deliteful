@@ -4,13 +4,12 @@ define([
 	"decor/sniff",
 	"requirejs-dplugins/Promise!",
 	"delite/register",
-	"delite/KeyNav",
 	"requirejs-dplugins/jquery!attributes/classes",
 	"delite/DisplayContainer",
 	"./Accordion/AccordionHeader",
 	"./features",
 	"delite/theme!./Accordion/themes/{{theme}}/Accordion.css"
-], function (dcl, has, Promise, register, KeyNav, $, DisplayContainer, AccordionHeader) {
+], function (dcl, has, Promise, register, $, DisplayContainer, AccordionHeader) {
 
 	function setVisibility(node, val) {
 		node.style.display = val ? "" : "none";
@@ -120,6 +119,7 @@ define([
 			}
 
 			this.on("delite-remove-child", this._onRemoveChild.bind(this));
+			this.on("keydown", this.keyDownHandler.bind(this));
 		},
 
 		/**
@@ -449,18 +449,10 @@ define([
 			this.notifyCurrentValue("_panelList");
 		},
 
-		//////////// delite/KeyNav implementation ///////////////////////////////////////
 		// Keyboard navigation is based on WAI-ARIA Pattern for Accordion:
-		// http://www.w3.org/TR/2013/WD-wai-aria-practices-20130307/#accordion
+		// https://www.w3.org/TR/wai-aria-practices/#accordion
 
-		// Arrow keys should go to first focusable field in each header.
-		// To get to the other focusable fields, user should use the tab key.
-		// By default, only the header itself is focusable.  If a subclass makes
-		// elements inside the header focusable, then it should change descendantSelector.
-		descendantSelector: "[role=heading] button[aria-controls], [role=heading] [role=button][aria-controls]",
-
-		_getCurrentHeader: function () {
-			var node = this.navigatedDescendant;
+		_getEnclosingHeader: function (node) {
 			while (node && node !== this) {
 				if (node.getAttribute("role") === "heading") {
 					return node;
@@ -469,35 +461,71 @@ define([
 			}
 		},
 
-		/**
-		 * Navigate to the next (offset=1) or previous header (offset=-1).
-		 * @param offset
-		 * @private
-		 */
-		_switchHeader: function (offset) {
-			var focusedHeader = this._getCurrentHeader();
-			if (focusedHeader) {
-				var headers = this.getHeaders();
-				var idx = headers.indexOf(focusedHeader),
-					newIdx = (idx + headers.length + offset) % headers.length;
-				this.navigateTo(headers[newIdx].focusNode);
+		_getEnclosingPanel: function (node) {
+			while (node && node !== this) {
+				if (node.getAttribute("role") === "region") {
+					return node;
+				}
+				node = node.parentElement;
 			}
 		},
 
-		previousKeyHandler: function () {
-			this._switchHeader(-1);
-		},
+		keyDownHandler: function (evt) {
+			// Handle keystrokes from headers.
+			var headers = this.getHeaders();
 
-		nextKeyHandler: function () {
-			this._switchHeader(1);
-		},
+			// Return next (offset=1) or previous (offset=-1) header, with looping.
+			function nextPrevHeader(header, offset) {
+				var idx = headers.indexOf(header),
+					newIdx = (idx + headers.length + offset) % headers.length;
+				return headers[newIdx];
+			}
 
-		upKeyHandler: function () {
-			this._switchHeader(-1);
-		},
+			// Return the new header to navigate to given the specified focusedHeader and the keydown event.
+			function headerKeystrokeHandler(focusedHeader, evt) {
+				switch (((evt.ctrlKey || evt.metaKey) ? "Ctrl-" : "") + evt.key) {
+				case "ArrowDown":
+					return nextPrevHeader(focusedHeader, 1);
+				case "ArrowUp":
+					return nextPrevHeader(focusedHeader, -1);
+				case "Home":
+					return headers[0];
+				case "End":
+					return headers[headers.length - 1];
+				case "Ctrl-PageDown":
+					return nextPrevHeader(focusedHeader, 1);
+				case "Ctrl-PageUp":
+					return nextPrevHeader(focusedHeader, -1);
+				}
+			}
 
-		downKeyHandler: function () {
-			this._switchHeader(1);
+			// Return the new header to navigate to given the specified focused panel and the keydown event.
+			function panelKeystrokeHandler(focusedPanel, evt) {
+				if (evt.ctrlKey || evt.metaKey) {
+					if (evt.key === "PageUp") {
+						return focusedPanel.headerNode;
+					} else if (evt.key === "PageDown") {
+						return nextPrevHeader(focusedPanel.headerNode, 1);
+					}
+				}
+			}
+
+			// Handle keystroke on headers and panels.
+			var focusedHeader = this._getEnclosingHeader(evt.target);
+			var newHeader;
+			if (focusedHeader) {
+				newHeader =  headerKeystrokeHandler(focusedHeader, evt);
+			} else {
+				var focusedPanel = this._getEnclosingPanel(evt.target);
+				if (focusedPanel) {
+					newHeader = panelKeystrokeHandler(focusedPanel, evt);
+				}
+			}
+			if (newHeader) {
+				newHeader.focus();
+				evt.stopPropagation();
+				evt.preventDefault();
+			}
 		},
 
 		focus: function () {
