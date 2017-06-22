@@ -435,7 +435,7 @@ define([
 		onAddChild: dcl.superCall(function (sup) {
 			return function (node) {
 				var res = sup.call(this, node);
-				if (node.getAttribute("role") !== "tab") {
+				if (node.getAttribute("role") !== "heading") {
 					// Process new panels (but not the headers created to go along with the panels).
 					this._panelList.push(this._setupUpgradedChild(node));
 					this.notifyCurrentValue("_panelList");
