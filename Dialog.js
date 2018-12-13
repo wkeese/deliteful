@@ -40,6 +40,11 @@ define([
 		modal: true,
 
 		/**
+		 * Whether or not dialog is draggable.
+		 */
+		draggable: true,
+
+		/**
 		 * The title of the Dialog, displayed at the top, above the content.
 		 * @member {string}
 		 */
@@ -58,10 +63,15 @@ define([
 		open: function () {
 			var previouslyFocusedNode = this.ownerDocument.activeElement;
 
+			// First make sure dialog is rendered, so that this.headerNode defined.
+			this.deliver();
+
+			// Then, display it.
 			popup.open({
 				parent: previouslyFocusedNode,
 				popup: this,
 				orient: ["center"],
+				dragHandle: this.draggable ? this.headerNode : null,
 				onExecute: this.close.bind(this),
 				onCancel: this.close.bind(this),
 				onClose: function () {
@@ -74,6 +84,7 @@ define([
 				}.bind(this)
 			});
 
+			// And finally, focus first focusable field.
 			this.focus();
 		},
 
