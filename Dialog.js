@@ -3,6 +3,7 @@ define([
 	"delite/register",
 	"delite/Container",
 	"delite/Dialog",
+	"./ResizeHandle",
 	"delite/handlebars!./Dialog/Dialog.html",
 	"requirejs-dplugins/i18n!./Dialog/nls/Dialog",
 	"delite/theme!./Dialog/themes/{{theme}}/Dialog.css",
@@ -12,6 +13,7 @@ define([
 	register,
 	Container,
 	Dialog,
+	ResizeHandle,
 	template,
 	messages
 ) {
@@ -45,6 +47,12 @@ define([
 		draggable: true,
 
 		/**
+		 * If set, makes dialog resizable.  One of: x|y|xy limit resizing to a single axis.
+		 * @member {string}
+		 */
+		resizeAxis: "",
+
+		/**
 		 * The title of the Dialog, displayed at the top, above the content.
 		 * @member {string}
 		 */
@@ -56,6 +64,24 @@ define([
 		 * @default "d-dialog-close-icon"
 		 */
 		closeButtonIconClass: "d-dialog-close-icon",
+
+		refreshRendering: function (props) {
+			// Add/remove ResizeHandle depending on whether or not Dialog is resizable.
+			if ("resizeAxis" in props) {
+				if (this._resizeHandle) {
+					this._resizeHandle.destroy();
+				}
+				if (this.resizeAxis) {
+					this._resizeHandle = new ResizeHandle({
+						target: this,
+						resizeAxis: this.resizeAxis
+					});
+
+					// Add it to root node, not this.containerNode.
+					HTMLElement.prototype.appendChild.call(this, this._resizeHandle);
+				}
+			}
+		},
 
 		/**
 		 * Display the Dialog.
