@@ -1,4 +1,6 @@
 define([
+	"dcl/advise",
+	"dojo/dnd/move",
 	"delite/popup",
 	"delite/register",
 	"delite/Container",
@@ -9,6 +11,8 @@ define([
 	"delite/theme!./Dialog/themes/{{theme}}/Dialog.css",
 	"delite/uacss"		// Dialog.css references "d-ie" class
 ], function (
+	advise,
+	move,
 	popup,
 	register,
 	Container,
@@ -19,6 +23,8 @@ define([
 ) {
 
 	"use strict";
+
+	var ParentConstrainedMoveable = move.parentConstrainedMoveable;
 
 	/**
 	 * A dialog widget, to be used as a popup.
@@ -82,13 +88,13 @@ define([
 				}
 			}
 
-			if ("draggable" in props && this._openArgs) {
+			if ("draggable" in props) {
 				if (this.draggable) {
-					this._openArgs.dragHandle = this.headerNode;
-					popup.enableDrag(this._openArgs);
+					this.enableDrag();
 				} else {
-					popup.disableDrag(this._openArgs);
+					this.disableDrag();
 				}
+
 			}
 		},
 
@@ -98,15 +104,10 @@ define([
 		open: function () {
 			var previouslyFocusedNode = this.ownerDocument.activeElement;
 
-			// First make sure dialog is rendered, so that this.headerNode defined.
-			this.deliver();
-
-			// Then, display it.
-			this._openArgs = {
+			popup.open({
 				parent: previouslyFocusedNode,
 				popup: this,
 				orient: ["center"],
-				dragHandle: this.draggable ? this.headerNode : null,
 				onExecute: this.close.bind(this),
 				onCancel: this.close.bind(this),
 				onClose: function () {
@@ -117,10 +118,8 @@ define([
 						previouslyFocusedNode.focus();
 					}
 				}.bind(this)
-			};
-			popup.open(this._openArgs);
+			});
 
-			// And finally, focus first focusable field.
 			this.focus();
 		},
 
@@ -143,39 +142,33 @@ define([
 
 		/**
 		 * Make the dialog draggable.
-		 * @param args
 		 */
 		enableDrag: function () {
 			if (!this.moveable) {
 				var wrapper = popup.moveOffScreen(this);
 
 				this.moveable = new ParentConstrainedMoveable(wrapper, {
-					handle: args.dragHandle,
+					handle: this.dragHandle,
 					area: "padding",
 					within: true
 				});
 
 				advise.after(this.moveable, "onMoveStop", function () {
-					this.dragged = true;
-					this._openArgs.orient = ["manual"];
+					this.emit("delite-dragged");
 				}.bind(this));
 			}
 		},
 
 		/**
 		 * Remove ability to drag the dialog.
-		 * @param args
 		 */
-		disableDrag: function (args) {
-			if (args.moveable) {
-				args.moveable.destroy();
-				delete args.moveable;
-				delete this.dragged;
-				this._openArgs.orient = ["center"];
-				// TODO: remove x/y setting?   Or does that happen automatically from the _repositionAll()?
-				popup._repositionAll();
+		disableDrag: function () {
+			if (this.moveable) {
+				this.moveable.destroy();
+				delete this.moveable;
 			}
 		},
+
 		/**
 		 * Called when clicking the dialog's close button.
 		 * @protected
