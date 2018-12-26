@@ -81,6 +81,15 @@ define([
 					HTMLElement.prototype.appendChild.call(this, this._resizeHandle);
 				}
 			}
+
+			if ("draggable" in props && this._openArgs) {
+				if (this.draggable) {
+					this._openArgs.dragHandle = this.headerNode;
+					popup.enableDrag(this._openArgs);
+				} else {
+					popup.disableDrag(this._openArgs);
+				}
+			}
 		},
 
 		/**
@@ -93,7 +102,7 @@ define([
 			this.deliver();
 
 			// Then, display it.
-			popup.open({
+			this._openArgs = {
 				parent: previouslyFocusedNode,
 				popup: this,
 				orient: ["center"],
@@ -108,7 +117,8 @@ define([
 						previouslyFocusedNode.focus();
 					}
 				}.bind(this)
-			});
+			};
+			popup.open(this._openArgs);
 
 			// And finally, focus first focusable field.
 			this.focus();
@@ -120,6 +130,7 @@ define([
 		 */
 		close: function () {
 			popup.close(this);
+			delete this._openArgs;
 		},
 
 		focus: function () {
@@ -130,6 +141,41 @@ define([
 			}
 		},
 
+		/**
+		 * Make the dialog draggable.
+		 * @param args
+		 */
+		enableDrag: function () {
+			if (!this.moveable) {
+				var wrapper = popup.moveOffScreen(this);
+
+				this.moveable = new ParentConstrainedMoveable(wrapper, {
+					handle: args.dragHandle,
+					area: "padding",
+					within: true
+				});
+
+				advise.after(this.moveable, "onMoveStop", function () {
+					this.dragged = true;
+					this._openArgs.orient = ["manual"];
+				}.bind(this));
+			}
+		},
+
+		/**
+		 * Remove ability to drag the dialog.
+		 * @param args
+		 */
+		disableDrag: function (args) {
+			if (args.moveable) {
+				args.moveable.destroy();
+				delete args.moveable;
+				delete this.dragged;
+				this._openArgs.orient = ["center"];
+				// TODO: remove x/y setting?   Or does that happen automatically from the _repositionAll()?
+				popup._repositionAll();
+			}
+		},
 		/**
 		 * Called when clicking the dialog's close button.
 		 * @protected
