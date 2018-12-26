@@ -129,7 +129,6 @@ define([
 		 */
 		close: function () {
 			popup.close(this);
-			delete this._openArgs;
 		},
 
 		focus: function () {
