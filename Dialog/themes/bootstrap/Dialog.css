@@ -4,6 +4,11 @@
   background: white;
   border-radius: 5px;
 }
+.d-dialog-inner {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
 .d-dialog-header {
   display: flex;
   align-items: center;
@@ -26,5 +31,5 @@
   overflow: auto;
 }
 .d-ie .d-dialog-container {
-  flex: 1 1 auto;
+  flex: 1 0 auto;
 }

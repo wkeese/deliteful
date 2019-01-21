@@ -5,7 +5,14 @@
 	border-radius: 5px;
 }
 
-// The top part of the TooltipDialog containing the label and the close icon.
+// Additional wrapper node to solve layout problems on IE.
+.d-dialog-inner {
+	display: flex;
+	flex: 1 0 auto;
+	flex-direction: column;
+}
+
+// The top part of the Dialog containing the label and the close icon.
 .d-dialog-header {
 	display: flex;
 	align-items: center;
@@ -32,7 +39,7 @@
 	.d-ie & {
 		// IE11 needs special CSS so natural sizing works (otherwise this node collapses completely.
 		// It breaks Chrome a little bit though (header is squashed), so doing conditionally for IE only.
-		flex: 1 1 auto;
+		flex: 1 0 auto;
 	}
 
 	padding: 10px;
