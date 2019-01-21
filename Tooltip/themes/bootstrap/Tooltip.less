@@ -6,6 +6,15 @@
 
 	// Set margin to make room for connector plus some space between the connector and the anchor node.
 	margin: 15px;
+
+	// Disable white background and box shadow from d-popup class.
+	// It doesn't work with the tooltip's irregular shape.
+	&.d-popup {
+		background: transparent;
+		-webkit-box-shadow: none;
+		-moz-box-shadow: none;
+		box-shadow: none;
+	}
 }
 
 // Wrapper for the triangle pointer coming out of the tooltip.
@@ -83,13 +92,4 @@
 // The part with the text.
 .d-tooltip-container {
 	padding: 10px;
-}
-
-// Disable white background and box shadow on popup wrapper.
-// It doesn't work with the tooltip's irregular shape.
-.d-popup.d-tooltip-popup {
-	background: transparent;
-	-webkit-box-shadow: none;
-	-moz-box-shadow: none;
-	box-shadow: none;
 }
