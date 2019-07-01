@@ -15,7 +15,7 @@ define([
 	 *
 	 * This widget is intended for being instantiated only by deliteful/Combobox;
 	 * it should not be instantiated directly.  If needed, its template
-	 * (deliteful/Combobox/ComboPopup.html) can be customized.
+	 * (deliteful/Combobox/Combobox-mobile.html) can be customized.
 	 * @class module:deliteful/Combobox/ComboPopup
 	 * @augments module:delite/ComboboxBase
 	 */
