@@ -202,6 +202,29 @@ define([
 		},
 
 		/**
+		 * Factory method which creates the ComboPopup.
+		 * @protected
+		 */
+		createComboPopup: function (labelledBy) {
+			return new this.ComboPopupConstructor({
+				autoFilter: this.autoFilter,
+				defaultQuery: this.defaultQuery,
+				displayedValue: this.displayedValue,
+				filterDelay: this.filterDelay,
+				filterMode: this.filterMode,
+				ignoreCase: this.ignoreCase,
+				labelledBy: labelledBy,
+				list: this.list,	// TODO: build list in ComboPopup (via ComboboxImplementation)?
+				minFilterChars: this.hasDownArrow ? 0 : this.minFilterChars,
+				okMsg: this.okMsg,
+				searchPlaceholder: this.searchPlaceholder,
+				selectionMode: this.selectionMode,
+				source: this.source,
+				value: this.value
+			});
+		},
+
+		/**
 		 * Factory method which creates the Dialog/TooltipDialog holding the ComboPopup.
 		 * @protected
 		 */
@@ -220,26 +243,14 @@ define([
 			dialog.classList.add(this.useCenteredDialog() ? "d-combo-popup-dialog" : "d-combo-popup-tooltip-dialog");
 			dialog.deliver();
 
+			var labelledBy = dialog.widgetId + "-label";
+
+			this.list.setAttribute("aria-labelledby", labelledBy);
+
 			// Create ComboPopup.
 			// Since the ComboPopup doesn't have a down arrow, if the Combobox does, then when
 			// user clicks it the ComboPopup list should be instantly shown.
-			this.list.setAttribute("aria-labelledby", dialog.widgetId + "-label");
-			this.comboPopup = new ComboPopup({
-				autoFilter: this.autoFilter,
-				defaultQuery: this.defaultQuery,
-				displayedValue: this.displayedValue,
-				filterDelay: this.filterDelay,
-				filterMode: this.filterMode,
-				ignoreCase: this.ignoreCase,
-				labelledBy: dialog.widgetId + "-label",
-				list: this.list,	// TODO: build list in ComboPopup (via ComboboxImplementation)?
-				minFilterChars: this.hasDownArrow ? 0 : this.minFilterChars,
-				okMsg: this.okMsg,
-				searchPlaceholder: this.searchPlaceholder,
-				selectionMode: this.selectionMode,
-				source: this.source,
-				value: this.value
-			});
+			this.comboPopup = this.createComboPopup(labelledBy);
 
 			this.comboPopup.on("execute", function () {
 				this.value = this.comboPopup.value;
