@@ -39,7 +39,7 @@ define([
 	/**
 	 * Shared base class for ComboPopupDialog and ComboPopupTooltipDialog.
 	 */
-	var ComboPopupDialogMixin = dcl({
+	var ComboPopupTooltipDialog = register("combo-popup-tooltip-dialog", [TooltipDialog], {
 		focus: function () {
 			// Call ComboPopup#focus().
 			var focused = this.containerNode.firstChild.focus();
@@ -51,8 +51,6 @@ define([
 			}
 		}
 	});
-	var ComboPopupDialog = register("combo-popup-dialog", [Dialog, ComboPopupDialogMixin]);
-	var ComboPopupTooltipDialog = register("combo-popup-tooltip-dialog", [TooltipDialog, ComboPopupDialogMixin]);
 
 	/**
 	 * Methods and properties for the desktop version, which has an <input>
@@ -236,11 +234,10 @@ define([
 					this.ownerDocument.getElementById(this.getAttribute("aria-labelledby")));
 			var header = headerNode ? headerNode.textContent.trim() : (this.getAttribute("aria-label") || "");
 
-			var DialogConstructor = this.useCenteredDialog() ? this.DialogConstructor : this.TooltipDialogConstructor;
-			var dialog = new DialogConstructor({
+			var dialog = new this.TooltipDialogConstructor({
 				label: header
 			});
-			dialog.classList.add(this.useCenteredDialog() ? "d-combo-popup-dialog" : "d-combo-popup-tooltip-dialog");
+			dialog.classList.add("d-combo-popup-tooltip-dialog");
 			dialog.deliver();
 
 			var labelledBy = dialog.widgetId + "-label";
@@ -367,13 +364,9 @@ define([
 	var Combobox = register("d-combobox", [HTMLElement, ComboboxAPI, Imp], /** @lends module:deliteful/Combobox# */ {
 		baseClass: "d-combobox",
 
-		/**
-		 * Widget used on phones to display the ComboPopup in a centered dialog.
-		 */
-		DialogConstructor: ComboPopupDialog,
 
 		/**
-		 * Widget used on tables to display the ComboPopup in a tooltip dialog.
+		 * Widget used on mobile to display the ComboPopup in a tooltip dialog / dialog.
 		 */
 		TooltipDialogConstructor: ComboPopupTooltipDialog,
 
@@ -402,7 +395,7 @@ define([
 		}
 	});
 
-	Combobox.ComboPopupDialogMixin = ComboPopupDialogMixin;
+	Combobox.ComboPopupTooltipDialog = ComboPopupTooltipDialog;
 
 	return Combobox;
 });
