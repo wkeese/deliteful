@@ -171,6 +171,8 @@ define([
 				}
 
 				sup.apply(this, arguments);
+
+				// TODO: destroy dropdown?
 			};
 		})
 	});
@@ -212,7 +214,7 @@ define([
 				filterMode: this.filterMode,
 				ignoreCase: this.ignoreCase,
 				labelledBy: labelledBy,
-				list: this.list,	// TODO: build list in ComboPopup (via ComboboxImplementation)?
+				list: this.list,
 				minFilterChars: this.hasDownArrow ? 0 : this.minFilterChars,
 				okMsg: this.okMsg,
 				searchPlaceholder: this.searchPlaceholder,
@@ -254,8 +256,6 @@ define([
 				this.displayedValue = this.comboPopup.displayedValue;
 			}.bind(this));
 
-			// TODO: pass everything from this._parsedAttributes matching ending in Attr or Func ?
-
 			this.comboPopup.deliver();
 
 			dialog.containerNode.appendChild(this.comboPopup);
@@ -272,11 +272,6 @@ define([
 					if (this.hasDownArrow) {
 						this.comboPopup.inputNode.value = this.displayedValue;
 					}
-
-					// We are opening the ComboPopup but may or may not want to show the list.
-					// _showOrHideList() will decide the right thing to do.
-					// TODO: how do I get this to happen in ComboPopup itself, when used standalone?
-					this.comboPopup._showOrHideList(this.comboPopup.inputNode);
 				}.bind(this));
 			};
 		})
