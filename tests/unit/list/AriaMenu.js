@@ -24,7 +24,8 @@ define(function (require) {
 				assert.strictEqual(list.type, "menu", "role");
 				assert.strictEqual(list.containerNode.hasAttribute("aria-readonly"), false,
 					"aria-readonly only for role=grid");
-				assert.strictEqual(list.containerNode.children[0].getAttribute("role"), "menuitem", "first renderer role");
+				assert.strictEqual(list.containerNode.children[0].getAttribute("role"), "menuitem",
+					"first renderer role");
 			},
 
 			"programmatic selection": function () {

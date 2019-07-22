@@ -32,7 +32,8 @@ define(function (require) {
 				assert.strictEqual(list.type, "listbox", "role");
 				assert.strictEqual(list.containerNode.hasAttribute("aria-readonly"), false,
 					"aria-readonly only for role=grid");
-				assert.strictEqual(list.containerNode.children[0].getAttribute("role"), "option", "first renderer role");
+				assert.strictEqual(list.containerNode.children[0].getAttribute("role"), "option",
+					"first renderer role");
 			},
 
 			"aria properties when moving from listbox to grid": function () {

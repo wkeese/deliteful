@@ -32,7 +32,8 @@ define(function (require) {
 				assert.strictEqual(list.type, "list", "role");
 				assert.strictEqual(list.containerNode.hasAttribute("aria-readonly"), false,
 					"aria-readonly only for role=grid");
-				assert.strictEqual(list.containerNode.children[0].getAttribute("role"), "listitem", "first renderer role");
+				assert.strictEqual(list.containerNode.children[0].getAttribute("role"), "listitem",
+					"first renderer role");
 			},
 
 			"aria properties when moving from list to grid": function () {
