@@ -6,7 +6,7 @@
  *  baseClass : d-list or d-round-rect-list
  * -----------------------------------------------
  */
- 
+
 @category-height: 22px;
 @cell-height: 43px;
 @round-radius: 8px;
@@ -16,26 +16,24 @@
 	font-size: 16px;
 	font-weight: bold;
 	color: white;
-	text-shadow: rgba(0, 0, 0, 0.6) 0 -1px 0;	
+	text-shadow: rgba(0, 0, 0, 0.6) 0 -1px 0;
 	border-top: 1px solid #a4b0b9;
 	border-bottom: 1px solid #979da3;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#8f9ea9), to(#b7c0c7));
 	background-image: linear-gradient(to bottom, #8f9ea9 0%, #b7c0c7 100%);
-	.d-list-cell {
-		padding: 0 10px;
-	}
+	padding: 0 10px;
 }
 
 .d-list-item-styles() {
 	border-bottom: 1px solid #adaaad;
 	background-color: #ffffff;
-	.d-list-cell {
+	&, .d-list-cell {
 		padding: 0 8px;
 	}
 }
 
 .d-last-renderer-style() {
-	 .d-list-cell {
+	 &, .d-list-cell {
 		border-bottom-width: 0;
 		/* padding-bottom to compensate the fact that the bottom width is 0 instead of 1 */
 		padding-bottom: 1px;

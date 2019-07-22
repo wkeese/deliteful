@@ -29,9 +29,7 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	.d-list-category-styles;
-	.d-list-cell {
-		height: @category-height;
-	}
+	height: @category-height;
 }
 
 .d-list-item {
@@ -39,7 +37,7 @@
 	list-style-type: none;
 	display: block;
 	.d-list-item-styles;
-	.d-list-cell {
+	&, .d-list-cell {
 		height: @cell-height;
 	}
 }

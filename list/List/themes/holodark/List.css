@@ -21,11 +21,7 @@
   border-bottom: 1px solid #979da3;
   background-image: -webkit-gradient(linear, left top, left bottom, from(#8f9ea9), to(#b7c0c7));
   background-image: linear-gradient(to bottom, #8f9ea9 0%, #b7c0c7 100%);
-}
-.d-list-category .d-list-cell {
   padding: 0 10px;
-}
-.d-list-category .d-list-cell {
   height: 22px;
 }
 .d-list-item {
@@ -35,9 +31,11 @@
   border-bottom: 1px solid #adaaad;
   background-color: #ffffff;
 }
+.d-list-item,
 .d-list-item .d-list-cell {
   padding: 0 8px;
 }
+.d-list-item,
 .d-list-item .d-list-cell {
   height: 43px;
 }

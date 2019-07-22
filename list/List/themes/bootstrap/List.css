@@ -25,14 +25,10 @@
   margin: 0;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.d-list-category .d-list-cell {
   background-color: #f5f5f5;
   color: #333333;
   border-bottom: 1px solid #dddddd;
   padding: 0 10px;
-}
-.d-list-category .d-list-cell {
   height: 35px;
 }
 .d-list-item {
@@ -40,10 +36,12 @@
   list-style-type: none;
   display: block;
 }
+.d-list-item,
 .d-list-item .d-list-cell {
   border-bottom: 1px solid #dddddd;
   padding: 0px 8px;
 }
+.d-list-item,
 .d-list-item .d-list-cell {
   height: 40px;
 }
@@ -189,6 +187,8 @@
 .d-multiselectable {
   cursor: pointer;
 }
+.d-selectable .d-list-item.d-selected,
+.d-multiselectable .d-list-item.d-selected,
 .d-selectable .d-list-item.d-selected .d-list-cell,
 .d-multiselectable .d-list-item.d-selected .d-list-cell {
   border-bottom: 1px solid #428bca;
