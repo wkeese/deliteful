@@ -41,9 +41,9 @@ define([
 
 		//////////// PROTECTED METHODS ///////////////////////////////////////
 
-		computeProperties: function (oldVals) {
+		computeProperties: function () {
 			// If subclass hasn't set the template in the prototype, then set it here, according to parentRole.
-			if (!this.template && this.parentRole) {
+			if (!this.constructor.prototype.template && this.parentRole) {
 				this.template = this.parentRole === "grid" ? GridItemTemplate : ItemTemplate;
 			}
 
