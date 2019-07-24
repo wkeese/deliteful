@@ -23,7 +23,9 @@
 }
 
 .d-list-item-styles() {
-	&, .d-list-cell {
+	// Account for role=list, where d-list-item and d-list-cell are same node,
+	// and role=grid, where d-list-item is the parent and d-list-cell is the child.
+	&.d-list-cell, .d-list-cell {
 		border-bottom: 1px solid @list-group-border;
 		padding: 0px 8px;
 	}
@@ -36,7 +38,9 @@
 }
 
 .d-list-item-selected-style() {
-	&, .d-list-cell {
+	// Account for role=list, where d-list-item and d-list-cell are same node,
+	// and role=grid, where d-list-item is the parent and d-list-cell is the child.
+	&.d-list-cell, .d-list-cell {
 		border-bottom: 1px solid @list-group-active-border;
 		background-color: @list-group-active-bg;
 		color: @list-group-active-color;

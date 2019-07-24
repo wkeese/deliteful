@@ -18,6 +18,31 @@
   border-radius: 4px;
   background-color: #ffffff;
 }
+.d-list {
+  /* edit display at your own risk */
+  display: block;
+  /* Position relative is needed by List.getBottomDistance(). */
+  /* The List must be positioned to be the offsetNode of renderers. */
+  /* Otherwise, the offsetTop value is computed against a wrong parent */
+  position: relative;
+  padding: 0;
+  /* Do not change this margin setting when customizing list in the app css*/
+  margin: 0;
+}
+.d-round-rect-list {
+  display: block;
+  position: relative;
+  margin: 0 9px;
+  padding: 0;
+}
+.d-round-rect-list > *:first-child {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+.d-round-rect-list > *:last-child {
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
 .d-list-category {
   /* No position should be defined, as the List is using offsetTop to measure distance of elements within the list */
   /* Edit display at your own risk */
@@ -32,21 +57,15 @@
   height: 35px;
 }
 .d-list-item {
-  /* No position should be defined, as the List is using offsetTop to measure distance of elements within the list */
   list-style-type: none;
   display: block;
 }
-.d-list-item,
+.d-list-item.d-list-cell,
 .d-list-item .d-list-cell {
   border-bottom: 1px solid #dddddd;
   padding: 0px 8px;
 }
-.d-list-item,
-.d-list-item .d-list-cell {
-  height: 40px;
-}
-.d-list .d-list-cell,
-.d-round-rect-list .d-list-cell {
+.d-list-cell {
   display: -webkit-box;
   display: -moz-box;
   display: -ms-flexbox;
@@ -62,9 +81,9 @@
   align-items: center;
   -webkit-align-items: center;
   outline-offset: -2px;
+  height: 40px;
 }
-.d-list .d-list-cell .d-spacer,
-.d-round-rect-list .d-list-cell .d-spacer {
+.d-list-cell .d-spacer {
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
   -webkit-flex: 1;
@@ -187,50 +206,12 @@
 .d-multiselectable {
   cursor: pointer;
 }
-.d-selectable .d-list-item.d-selected,
-.d-multiselectable .d-list-item.d-selected,
+.d-selectable .d-list-item.d-selected.d-list-cell,
+.d-multiselectable .d-list-item.d-selected.d-list-cell,
 .d-selectable .d-list-item.d-selected .d-list-cell,
 .d-multiselectable .d-list-item.d-selected .d-list-cell {
   border-bottom: 1px solid #428bca;
   background-color: #428bca;
   color: #ffffff;
   font-weight: bold;
-}
-/*******************************/
-/* iOS theme for RoundRectList */
-/*                             */
-/* IMPORTANT: a renderer MUST      */
-/* have the same height (inc.  */
-/* borders) whatever its index */
-/* in the list !               */
-/*******************************/
-.d-round-rect-list {
-  /* edit display at your own risk */
-  display: block;
-  /* Position relative is needed by List.getBottomDistance(). */
-  /* The List must be positioned to be the offsetNode of renderers. */
-  /* Otherwise, the offsetTop value is computed against a wrong parent */
-  position: relative;
-  /* Do not change this margin setting when customizing list in the app css */
-  margin: 0 9px;
-  padding: 0;
-}
-.d-round-rect-list > *:first-child {
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-}
-.d-round-rect-list > *:last-child {
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
-}
-.d-list {
-  /* edit display at your own risk */
-  display: block;
-  /* Position relative is needed by List.getBottomDistance(). */
-  /* The List must be positioned to be the offsetNode of renderers. */
-  /* Otherwise, the offsetTop value is computed against a wrong parent */
-  position: relative;
-  padding: 0;
-  /* Do not change this margin setting when customizing list in the app css*/
-  margin: 0;
 }
