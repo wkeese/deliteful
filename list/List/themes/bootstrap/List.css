@@ -185,6 +185,11 @@
   color: #ffffff;
   font-weight: bold;
 }
+[role="option"][aria-selected="true"]::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+}
 .d-list-loader {
   font-weight: 500;
   height: 38px;

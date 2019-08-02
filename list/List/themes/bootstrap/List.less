@@ -63,6 +63,13 @@
 	}
 }
 
+// Hack to get JAWS to announce "unselected" when toggling item.
+[role="option"][aria-selected="true"]::before {
+	content: '✓';
+	position: absolute;
+	left: 0;
+}
+
 .d-list-loader {
 	font-weight: 500;
 	height: @cell-height - 2;
