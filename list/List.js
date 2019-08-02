@@ -1243,8 +1243,7 @@ define([
 		},
 
 		/**
-		 * Returns the renderer that currently has the focused or is
-		 * an ancestor of the focused node.
+		 * Returns the renderer that currently has the focus or is an ancestor of the focused node.
 		 * @return {module:deliteful/list/Renderer}
 		 * @private
 		 */
