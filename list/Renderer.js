@@ -1,11 +1,11 @@
 /** @module deliteful/list/Renderer */
 define([
 	"dcl/dcl",
-	"delite/register",
-	"delite/classList",
 	"delite/Widget"
-], function (dcl, register, classList, Widget) {
-
+], function (
+	dcl,
+	Widget
+) {
 	/**
 	 * The base class for a widget that render an item or its category inside a deliteful/list/List widget.
 	 *
@@ -53,8 +53,10 @@ define([
 						+ " Example using attach-point in a template: "
 						+ "<template><div attach-point='renderNode'></div></template>");
 			}
-			this.renderNode.tabIndex = -1;
-			classList.addClass(this.renderNode, "d-list-cell");
+
+			// TODO: Just set this in the template.
+			this.renderNode.classList.add("d-list-cell");
+
 			this.updateFocusableChildren();
 		}),
 

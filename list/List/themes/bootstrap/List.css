@@ -175,7 +175,9 @@
   height: 40px;
 }
 .d-selectable .d-list-item:hover,
-.d-multiselectable .d-list-item:hover {
+.d-multiselectable .d-list-item:hover,
+.d-selectable .d-list-item.d-active-descendant,
+.d-multiselectable .d-list-item.d-active-descendant {
   background-color: #f5f5f5;
 }
 .d-selectable .d-list-cell.d-selected,

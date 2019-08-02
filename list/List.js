@@ -46,8 +46,11 @@ define([
 	 * @augments module:delite/Scrollable
 	 */
 
-	return register("d-list", [HTMLElement, Selection, KeyNav, StoreMap, Scrollable],
-		/** @lends module:deliteful/list/List# */ {
+		// For giving unique ids to children.
+	var cnt = 0;
+
+	var inherits = [HTMLElement, Selection, KeyNav, StoreMap, Scrollable];
+	return register("d-list", inherits, /** @lends module:deliteful/list/List# */ {
 
 		/**
 		 * Dojo object store that contains the items to render in the list.
@@ -197,6 +200,9 @@ define([
 		_displayedPanel: "",
 
 		template: template,
+
+		// Keep focus on the root node as that makes JAWS work better.
+		focusDescendants: false,
 
 		/**
 		 * Defines the scroll direction: `"vertical"` for a scrollable List, `"none"` for a non scrollable List.
@@ -807,9 +813,9 @@ define([
 		 */
 		_createItemRenderer: function (item) {
 			var renderer = new this.itemRenderer({
+				id: this.widgetId + "-item-" + cnt++,
 				item: item,
-				parentRole: this.type,
-				tabindex: "-1"
+				parentRole: this.type
 			});
 			renderer.deliver();
 			if (this.selectionMode !== "none" && (this.type === "grid" || this.type === "listbox")) {
@@ -829,9 +835,9 @@ define([
 		 */
 		_createCategoryRenderer: function (item) {
 			var renderer = new this.categoryRenderer({
+				id: this.widgetId + "-item-" + cnt++,
 				item: item,
-				parentRole: this.type,
-				tabindex: "-1"
+				parentRole: this.type
 			});
 			return renderer;
 		},
@@ -1057,6 +1063,11 @@ define([
 					this.navigateTo(cell);
 				}
 			}
+		},
+
+		focusinHandler: function () {
+			// When container is focused, set navigatedDescendant.
+			this.focus();
 		},
 
 		focusoutHandler: dcl.superCall(function (sup) {
