@@ -584,20 +584,16 @@ define([
 
 		/**
 		 * Event handler that performs items (de)selection.
-		 * @param {Event} event The event the handler was called for.
-		 * @returns {boolean} `true` if the event has been handled, that is if the
-		 *    event target has an enclosing item renderer. Returns `false` otherwise.
+		 * @param {Event} event - The event the handler was called for.
 		 * @protected
 		 */
-		handleSelection: function (/*Event*/event) {
-			var eventRenderer = this.getEnclosingRenderer(event.target);
+		handleSelection: function (event) {
+			var eventRenderer = this.navigatedDescendant;
 			if (eventRenderer) {
 				if (!this.isCategoryRenderer(eventRenderer)) {
 					this.selectFromEvent(event, eventRenderer.item, eventRenderer, true);
 				}
-				return true;
 			}
-			return false;
 		},
 
 		//////////// Private methods ///////////////////////////////////////
@@ -1178,11 +1174,11 @@ define([
 		 * @private
 		 */
 		_spaceKeydownHandler: function (evt) {
-			if (this.selectionMode !== "none" && this.getEnclosingRenderer(evt.target)) {
+			if (this.selectionMode !== "none" && this.navigatedDescendant) {
 				evt.preventDefault();
 
-				// Wait until keyup to fire the selection event, so widgets like ComboButton don't switch focus
-				// too early, sending a stray keyup event to the ComboButton anchor node.
+				// Wait until keyup to fire the selection event, so widgets like DropDownButton don't switch focus
+				// too early, sending a stray keyup event to the DropDownButton dropdown node.
 				var handle = this.on("keyup", function (evt2) {
 					handle.remove();
 					this.handleSelection(evt2);
