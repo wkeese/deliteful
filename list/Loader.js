@@ -1,42 +1,50 @@
 /** @module deliteful/list/Loader */
-define([
-	"dcl/dcl",
-	"delite/register",
-	"delite/Widget",
-	"delite/handlebars!./List/Loader.html"
-], function (dcl, register, Widget, template) {
-	"use strict";
+import register from "delite/register";
+import LitWidget from "delite/LitWidget";
+import { html } from "lit-html";
+
+// Used in template.
+import "../ProgressIndicator";
+
+/**
+ * An helper widget that renders a progress indicator and a label.
+ *
+ * Depending of the value of its `loading` property, it shows a `loadingMessage` or a `loadMessage`.
+ * Furthermore, if `loading` is equal to `true`, an active progress indicator is displayed too.
+ *
+ * @class module:deliteful/list/Loader
+ * @augments module:deliteful/list/Loader
+ */
+export default register("d-list-loader", [ HTMLElement, LitWidget ], {
+	baseClass: "d-list-loader",
 
 	/**
-	 * An helper widget that renders a progress indicator and a label.
-	 *
-	 * Depending of the value of its `loading` property, it shows a `loadingMessage` or a `loadMessage`.
-	 * Furthermore, if `loading` is equal to `true`, an active progress indicator is displayed too.
-	 *
-	 * See the {@link https://github.com/ibm-js/deliteful/tree/master/docs/list/PageableList.md user documentation}
-	 * for more details.
-	 *
-	 * @class module:deliteful/list/Loader
-	 * @augments module:deliteful/list/Loader
+	 * Loader's message.
+	 * @type {string}
+	 * @default ""
 	 */
-	return register("d-list-loader", [HTMLElement, Widget], {
+	label: "",
 
-		baseClass: "d-list-loader",
+	/**
+	 * It determines if the loader is active or not.
+	 * @type {Boolean}
+	 * @default false
+	 */
+	loading: false,
 
-		template: template,
+	render: function () {
+		const { label, loading, widgetId } = this;
 
-		/**
-		 * Loader's message.
-		 * @type {string}
-		 * @default ""
-		 */
-		label: "",
-
-		/**
-		 * It determines if the loader is active or not.
-		 * @type {Boolean}
-		 * @default false
-		 */
-		loading: false
-	});
+		return html`
+			<div class="d-list-loader ${this.loading ? "d-loading" : ""}" role="button"
+					aria-labelledby="${widgetId}-label" aria-disabled="${loading}">
+				<div class="d-spacer"></div>
+				<d-progress-indicator class="d-list-loader-progress-indicator" active=${loading}
+					d-hidden="${!this.loading}"></d-progress-indicator>
+				<div class="d-list-loader-label" id="${widgetId}-label">${label}</div>
+				<div class="d-spacer"></div>
+			</div>
+		`;
+	}
 });
+
