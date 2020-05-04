@@ -1,9 +1,9 @@
 import register from "delite/register";
-import ItemRenderer from "deliteful/list/ItemRenderer";
+import Widget from "delite/Widget";
 import List from "deliteful/list/List";
 import { html } from "lit-html";
 
-register("d-data-form-item", [ ItemRenderer ], {
+register("d-data-form-item", [ HTMLElement, Widget ], {
 	item: null,
 
 	counter: 1,

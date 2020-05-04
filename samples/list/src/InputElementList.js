@@ -1,9 +1,9 @@
 import register from "delite/register";
-import ItemRenderer from "deliteful/list/ItemRenderer";
+import Widget from "delite/Widget";
 import List from "deliteful/list/List";
 import { html } from "lit-html";
 
-register("d-configuration-item", [ ItemRenderer ], {
+register("d-configuration-item", [ HTMLElement, Widget ], {
 	render: function () {
 		this.setAttribute("role", "row");
 		const div = this.ownerDocument.createElement("div");
