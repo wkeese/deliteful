@@ -56,7 +56,8 @@ const map = {
 	// For List functional test pages.
 	"deliteful/tests/functional/list/ComplexList": require("deliteful/tests/functional/list/ComplexList"),
 	"deliteful/tests/functional/list/CustomList1": require("deliteful/tests/functional/list/CustomList1"),
-	"deliteful/tests/functional/list/BookList": require("deliteful/tests/functional/list/BookList")
+	"deliteful/tests/functional/list/BookList": require("deliteful/tests/functional/list/BookList"),
+	"deliteful/tests/functional/list/BookTable": require("deliteful/tests/functional/list/BookTable")
 };
 
 // Create Promise that resolves when the document has finished loading.

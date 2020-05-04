@@ -13,13 +13,13 @@
 	<script type="text/javascript">
 		var ready = false;
 		delitefulRequire([
-			"deliteful/tests/functional/list/BookList"
-		], function (BookList) {
-			var list = new BookList({
+			"deliteful/tests/functional/list/BookTable"
+		], function (BookTable) {
+			var table = new BookTable({
 				id: "table-1",
 				categoryAttr: "bookstore"
 			});
-			list.placeAt(document.getElementById("listPlaceholder"), "replace");
+			table.placeAt(document.getElementById("listPlaceholder"), "replace");
 
 			document.body.addEventListener("keydown", function (e) {
 				document.getElementById("keydownEvent").textContent = e.key;
