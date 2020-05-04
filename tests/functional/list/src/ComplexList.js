@@ -1,6 +1,6 @@
 import register from "delite/register";
-import List from "deliteful/list/List";
 import { html } from "lit-html";
+import List from "deliteful/list/List";
 
 export default register("complex-list", [ List ], {
 	renderItem: function (item) {

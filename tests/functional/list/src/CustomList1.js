@@ -1,6 +1,6 @@
 import register from "delite/register";
-import List from "deliteful/list/List";
 import { html } from "lit-html";
+import List from "deliteful/list/List";
 
 export default register("d-custom-nav", [ List ], {
 	renderItem: function () {

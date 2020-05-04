@@ -1,4 +1,5 @@
 import register from "delite/register";
+import { html } from "lit-html";
 import List from "deliteful/list/List";
 
 export default register("d-book-list", [ List ], {
