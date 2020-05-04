@@ -1,8 +1,9 @@
 import register from "delite/register";
 import ItemRenderer from "deliteful/list/ItemRenderer";
 import List from "deliteful/list/List";
+import { html } from "lit-html";
 
-const MyCustomRenderer = register("d-data-form-item", [ ItemRenderer ], {
+register("d-data-form-item", [ ItemRenderer ], {
 	item: null,
 
 	counter: 1,
@@ -45,6 +46,9 @@ const MyCustomRenderer = register("d-data-form-item", [ ItemRenderer ], {
 });
 
 export default register("d-data-form", [ List ], {
-	ItemRenderer: MyCustomRenderer,
+	renderItem: function (item) {
+		return html`<d-data-form-item .item="${item}"></d-data-form-item>`;
+	},
+
 	copyAllItemProps: true
 });
