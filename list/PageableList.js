@@ -1,14 +1,12 @@
 /** @module deliteful/list/PageableList */
 import dcl from "dcl/dcl";
 import { html } from "lit-html";
+import { classMap } from "lit-html/directives/class-map";
 import "delite/a11y";		// d-keyboard-click
 import register from "delite/register";
 import string from "dojo/string";
 import List from "./List";
 import messages from "requirejs-dplugins/i18n!./List/nls/Pageable";
-
-// Used in template.
-import "deliteful/list/Loader";
 
 /**
  * A widget that renders a scrollable list of items and provides paging.
@@ -257,7 +255,7 @@ export default register("d-pageable-list", [ List ], /** @lends module:deliteful
 		}
 	}),
 
-	computeProperties: function () {
+	computeProperties: function (props) {
 		this._displayedPanel = this._busy && this.hideOnPageLoad && !this.autoPaging ? "loading-panel" :
 			this.renderItems && this.renderItem.length > 0 ? "list" : this.showNoItems ? "no-items" : "none";
 
@@ -271,44 +269,7 @@ export default register("d-pageable-list", [ List ], /** @lends module:deliteful
 
 		this._showNextPageButton = this._nextRecordsMayExist && this._displayedPanel === "list";
 		this._showPreviousPageButton = this._previousRecordsMayExist && this._displayedPanel === "list";
-	},
 
-	render: dcl.superCall(function (sup) {
-		const {
-			loadingPreviousPage, _previousPageButtonLabel, _showPreviousPageButton,
-			loadingNextPage, _nextPageButtonLabel, _showNextPageButton,
-			tabIndex
-		} = this;
-
-		const previousPageButton = _showPreviousPageButton ? html`
-			<d-list-loader
-				class="d-list-previous-loader d-list-cell"
-				@click="${evt => this._loadPreviousPage(evt)}" d-keyboard-click="true"
-				.loading=${loadingPreviousPage}
-				.label="${_previousPageButtonLabel}"
-				.tabIndex="${tabIndex}"
-			></d-list-loader>
-		` : null;
-
-		const nextPageButton = _showNextPageButton ? html`
-			<d-list-loader class="d-list-next-loader d-list-cell"
-				@click="${evt => this._loadNextPage(evt)}" d-keyboard-click="true"
-				.loading=${loadingNextPage}
-				.label="${_nextPageButtonLabel}"
-				.tabIndex="${tabIndex}"
-			></d-list-loader>
-		` : null;
-
-		return function () {
-			return html`
-				${previousPageButton}
-				${sup.call(this)}
-				${nextPageButton}
-			`;
-		};
-	}),
-
-	refreshRendering: function (props) {
 		if (this.pageLength > 0) {
 			if ("_collection" in props && this._collection) {
 				// Initial loading of the list
@@ -327,7 +288,59 @@ export default register("d-pageable-list", [ List ], /** @lends module:deliteful
 				}.bind(this));
 			}
 		}
+	},
 
+	render: dcl.superCall(function (sup) {
+		return function () {
+			const { _showPreviousPageButton, _showNextPageButton } = this;
+
+			const previousPageButton = _showPreviousPageButton ? this.renderLoader(true) : null;
+			const nextPageButton = _showNextPageButton ? this.renderLoader(false) : null;
+
+			return html`
+				${previousPageButton}
+				${sup.call(this)}
+				${nextPageButton}
+			`;
+		};
+	}),
+
+	/**
+	 * Render the next page and previous page buttons.
+	 * @param prev
+	 * @returns {*}
+	 */
+	renderLoader: function (prev) {
+		const { tabIndex } = this;
+
+		const classes = {
+			"d-list-loader": true,
+			"d-list-cell": true,
+			"d-list-previous-loader": prev,
+			"d-list-next-loader": !prev,
+			"d-loading": loading
+		};
+
+		const labelId = `${this.widgetId}-${prev ? "prev" : "next"}-button-label`;
+		const loading = prev ? this.loadingPreviousPage : this.loadingNextPage;
+		const label = prev ? this._previousPageButtonLabel : this._nextPageButtonLabel;
+
+		const clickHandler = evt => prev ? this._loadPreviousPage(evt) : this._loadNextPage(evt);
+
+		return html`
+			<div class="${classMap(classes)}" role="button"
+					aria-labelledby="${labelId}" aria-disabled="${loading}" tabindex="${tabIndex}"
+					@click="${ evt => clickHandler(evt) }">
+				<div class="d-spacer"></div>
+				${ loading ? html`<d-progress-indicator class="d-list-loader-progress-indicator" active=true
+					></d-progress-indicator>` : null }
+				<div class="d-list-loader-label" id="${labelId}">${label}</div>
+				<div class="d-spacer"></div>
+			</div>
+		`;
+	},
+
+	refreshRendering: function (props) {
 		// If user [keyboard] clicked the "next page" button, move focus to last visible list item.
 		// Important if we just hid that button because there are no more pages.
 		// Likewise if focus was on the "first page" button.
