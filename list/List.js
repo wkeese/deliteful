@@ -237,17 +237,10 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 	 * @private
 	 */
 
-	/**
-	 * The items currently displayed.  Similar to Store#renderItems[] but may have been
-	 * fetched in multiple batches (when extending PageableList and PageableList#maxPages > 1.
-	 */
-	displayedItems: null,
-
 	constructor: function () {
 		this.on("query-error", function () {
 			this._busy = false;
 		}.bind(this));
-		this.displayedItems = [];
 	},
 
 	computeProperties: function (props) {
@@ -344,7 +337,7 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 	 * @returns {TemplateResult}
 	 */
 	renderList: function () {
-		const { _busy, displayedItems, selectionMode, tabIndex, type, widgetId } = this;
+		const { _busy, renderItems, selectionMode, tabIndex, type, widgetId } = this;
 
 		const classes = {
 			"d-list-container": true,
@@ -353,14 +346,14 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 		};
 
 		const firstInCategory = idx => this._isCategorized() &&
-			(idx === 0 || displayedItems[idx].category !== displayedItems[idx - 1].category);
+			(idx === 0 || renderItems[idx].category !== renderItems[idx - 1].category);
 
 		return html`
 			<div id="${widgetId}-container" role="${type}" class="${classMap(classes)}" tabindex="${tabIndex}"
 				 aria-readonly="true" aria-busy="${_busy}"
 				 aria-multiselectable="${ifDefined(selectionMode === "multiple" ? "true" : undefined)}">
 				 
-				 ${ repeat(displayedItems, item => this.getIdentity(item), (item, idx) => html`
+				 ${ repeat(renderItems, item => this.getIdentity(item), (item, idx) => html`
 					${ firstInCategory(idx) ? this.renderCategory(item) : null }
 					${ this.renderItem(item) }
 				`) }
@@ -535,14 +528,15 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 	//////////// Renderers life cycle ///////////////////////////////////////
 
 	/**
-	 * Adds page of items to the displayedItems[] array, triggering them to render.
-	 * @param {Object[]} items - The new items to render.
+	 * Adds page of items to the renderItems[] array, triggering them to render.
+	 * @param {Object[]} newItems - The new items to render.
 	 * @param {boolean} atTheTop - If true, the new items are rendered at the top of the list.
 	 * If false, they are rendered at the bottom of the list.
 	 * @private
 	 */
-	_addPage: function (items, atTheTop) {
-		this.displayedItems = atTheTop ? [...items, ...this.displayedItems] : [...this.displayedItems, ...items];
+	_addPage: function (newItems, atTheTop) {
+		const oldItems = this.renderItems || [];
+		this.renderItems = atTheTop ? [...newItems, ...oldItems] : [...oldItems, ...newItems];
 	},
 
 	////////////delite/Store implementation ///////////////////////////////////////

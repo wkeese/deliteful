@@ -257,15 +257,9 @@ export default register("d-pageable-list", [ List ], /** @lends module:deliteful
 		}
 	}),
 
-	computeProperties: function (props) {
-		if (this.pageLength > 0) {
-			if ("_busy" in props || "hideOnPageLoad" in props || "autoPaging" in props || "showNoItems" in props
-				|| "_previousRecordsMayExist" in props || "_nextRecordsMayExist" in props) {
-				this._displayedPanel = (this._busy && this.hideOnPageLoad && !this.autoPaging) ? "loading-panel" :
-					(this.containerNode && this.containerNode.children.length > 0) ?
-						"list" : ((this.showNoItems) ? "no-items" : "none");
-			}
-		}
+	computeProperties: function () {
+		this._displayedPanel = this._busy && this.hideOnPageLoad && !this.autoPaging ? "loading-panel" :
+			this.renderItems && this.renderItem.length > 0 ? "list" : this.showNoItems ? "no-items" : "none";
 
 		// Due to the string.substitute(), any change to any property could trigger a change to
 		// _previousPageButtonLabel, _nextPageButtonLabel.
@@ -398,7 +392,7 @@ export default register("d-pageable-list", [ List ], /** @lends module:deliteful
 	_unloadPage: function (first) {
 		if (first) {
 			const idPage = this._idPages.shift();
-			this.displayedItems = this.displayedItems.slice(idPage.length);
+			this.renderItems = this.renderItems.slice(idPage.length);
 			this._firstLoaded += idPage.length;
 			if (idPage.length) {
 				this._previousRecordsMayExist = true;
@@ -409,7 +403,7 @@ export default register("d-pageable-list", [ List ], /** @lends module:deliteful
 			}
 		} else {
 			const idPage = this._idPages.pop();
-			this.displayedItems = this.displayedItems.slice(0, idPage.length);
+			this.renderItems = this.renderItems.slice(0, idPage.length);
 			this.lastLoaded -= idPage.length;
 			if (idPage.length) {
 				this._nextRecordsMayExist = true;
@@ -609,7 +603,7 @@ export default register("d-pageable-list", [ List ], /** @lends module:deliteful
 	//////////// List methods overriding ///////////////////////////////////////
 
 	_empty: function () {
-		this.displayedItems = [];
+		this.renderItems = [];
 		if (this.pageLength > 0) {
 			this._nextRecordsMayExist = false;
 			this._previousRecordsMayExist = false;
