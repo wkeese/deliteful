@@ -5,7 +5,7 @@ import { html } from "lit-html";
 export default register("complex-list", [ List ], {
 	renderItem: function (item) {
 		return html`
-			<div role="row">
+			<div role="row" class="d-list-item">
 				<div role="gridcell" class="d-list-cell" tabindex="-1">${item.title}</div>
 				<div role="gridcell" class="d-list-cell complex-cell" tabindex="-1">
 					<label for="${item.id}-input1">First input:</label>

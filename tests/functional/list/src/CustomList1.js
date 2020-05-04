@@ -5,7 +5,7 @@ import { html } from "lit-html";
 export default register("d-custom-nav", [ List ], {
 	renderItem: function () {
 		return html`
-			<div role="row">
+			<div role="row" class="d-list-item">
 				<div role="gridcell" class="d-list-cell" tabindex="-1">
 					<div>
 						<div tabindex="1">1 tabindex 1</div>

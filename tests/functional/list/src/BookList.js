@@ -4,7 +4,7 @@ import List from "deliteful/list/List";
 export default register("d-book-list", [ List ], {
 	renderItem: function (item) {
 		return html`
-			<div role="row">
+			<div role="row" class="d-list-item">
 				<div role="gridcell" class="d-list-cell" tabindex="-1">
 					<div tabindex="0">${item.title}</div>
 					<div class="d-spacer"></div>
@@ -16,8 +16,8 @@ export default register("d-book-list", [ List ], {
 
 	renderCategory: function (item) {
 		return html`
-			<div role="row">
-				<div role="gridcell" class="d-list-cell" tabindex="-1">
+			<div role="row" class="d-list-item">
+				<div role="columnheader" class="d-list-cell" tabindex="-1">
 					<div tabindex="0">${item.category}</div>
 					<div class="d-spacer"></div>
 					<a tabindex="-1" href="${item.bookstoreUrl}">${item.bookstoreUrl}</a>
