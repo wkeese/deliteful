@@ -8,7 +8,6 @@ import List from "./List";
 import messages from "requirejs-dplugins/i18n!./List/nls/Pageable";
 
 // Used in template.
-// TODO: convert to lit-html and inline.
 import "deliteful/list/Loader";
 
 /**
@@ -247,11 +246,15 @@ export default register("d-pageable-list", [ List ], /** @lends module:deliteful
 	_focusLastListItem: false,
 
 	previousPageLoader: dcl.prop({
-		get: () => this.querySelector("d-list-loader")
+		get: function () {
+			return this.querySelector("d-list-loader");
+		}
 	}),
 
 	nextPageLoader: dcl.prop({
-		get: () => this.querySelectorAll("d-list-loader")[1]
+		get: function () {
+			return this.querySelector("d-list-loader:nth-child(2)");
+		}
 	}),
 
 	computeProperties: function (props) {
@@ -526,7 +529,7 @@ export default register("d-pageable-list", [ List ], /** @lends module:deliteful
 
 		// If focus is on the "previous page" button, then set flag to move focus inside the list.
 		// Especially important for the case when the "previous page" button is about to be hidden.
-		if (this.previousPageLoader.contains(this.ownerDocument.activeElement)) {
+		if (this.previousPageLoader && this.previousPageLoader.contains(this.ownerDocument.activeElement)) {
 			this.notifyCurrentValue("_focusFirstListItem");
 		}
 	},
@@ -558,7 +561,7 @@ export default register("d-pageable-list", [ List ], /** @lends module:deliteful
 
 		// If focus is on the "next page" button, then set flag to move focus inside the list.
 		// Especially important for the case when the "next page" button is about to be hidden.
-		if (this.nextPageLoader.contains(this.ownerDocument.activeElement)) {
+		if (this.nextPageLoader && this.nextPageLoader.contains(this.ownerDocument.activeElement)) {
 			this.notifyCurrentValue("_focusLastListItem");
 		}
 	},
@@ -569,7 +572,7 @@ export default register("d-pageable-list", [ List ], /** @lends module:deliteful
 	 */
 	_getLastVisibleRenderer: function () {
 		const renderers = this.getNavigableRows().reverse();
-		return renderers.find(renderer => this.getBottomDistance(renderer) <= 0);
+		return Array.from(renderers).find(renderer => this.getBottomDistance(renderer) <= 0);
 	},
 
 	/**

@@ -352,8 +352,8 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 			[this._cssClasses.multiselectable]: this.selectionMode === "multiple"
 		};
 
-		const firstInCategory = idx => this._isCategorized() && idx > 0 &&
-			displayedItems[idx].category !== displayedItems[idx - 1].category;
+		const firstInCategory = idx => this._isCategorized() &&
+			(idx === 0 || displayedItems[idx].category !== displayedItems[idx - 1].category);
 
 		return html`
 			<div id="${widgetId}-container" role="${type}" class="${classMap(classes)}" tabindex="${tabIndex}"
@@ -369,15 +369,15 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 	},
 
 	renderCategory: function (item) {
-		if (this.role === "grid") {
+		if (this.type === "grid") {
 			return html`
-				<div role="row">
-					<div class="d-list-cell" role="columnheader" tabindex="-1">${item.category}</div>
+				<div role="row" class="d-list-category">
+					<div role="columnheader" class="d-list-cell" tabindex="-1">${item.category}</div>
 				</div>
 			`;
 		} else {
 			return html`
-				<div class="d-list-cell" role="heading">${item.category}</div>
+				<div role="heading" class="d-list-category">${item.category}</div>
 			`;
 		}
 	},
@@ -392,13 +392,14 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 		// for that case, rather than "true" or "false", and leverage ifDefined().
 		const ariaSelected = (this.type === "grid" || this.type === "listbox") ? "" + isSelected : undefined;
 
-		if (this.role === "grid") {
+		if (this.type === "grid") {
 			const classes = {
+				"d-list-item": true,
 				[this._cssClasses.selected]: isSelected
 			};
 
 			return html`
-				<div role="row" aria-selected="${ifDefined(ariaSelected)}" class="${classMap(classes)}
+				<div role="row" aria-selected="${ifDefined(ariaSelected)}" class="${classMap(classes)}"
 					@click="${evt => this.handleSelection(evt, item, evt.currentTarget)}" d-keyboard-click="true">
 					<div role="gridcell" class="d-list-cell" tabindex="-1">
 						<div class="d-list-item-icon ${item.iconclass}" aria-hidden="true" role="presentation"></div>
@@ -419,6 +420,7 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 			}[this.type];
 
 			const classes = {
+				"d-list-item": true,
 				"d-list-cell": true,
 				[this._cssClasses.selected]: isSelected
 			};
@@ -441,26 +443,25 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 	//////////// Public methods ///////////////////////////////////////
 
 	/**
-	 * Returns the renderer enclosing a dom node, or null
+	 * Returns the renderer enclosing an Element, or null.
 	 * if there is none.
 	 * @param {Element} node The dom node.
-	 * @returns {module:deliteful/list/Renderer}
+	 * @returns {Element}
 	 */
 	getEnclosingRenderer: function (node) {
-		while (node && node.parentNode && node.parentNode.id !== `${this.widgetId}-container}`) {
+		while (node && node.parentNode && node.parentNode.id !== `${this.widgetId}-container`) {
 			node = node.parentNode;
 		}
 		return node;
 	},
 
 	/**
-	 * Returns the row enclosing a dom node, or null
-	 * if there is none.
+	 * Returns the row enclosing a dom node, or null if there is none.
 	 *
 	 * For non-grid type Lists, same as getEnclosingRenderer().
 	 *
 	 * @param {Element} node The dom node.
-	 * @returns {module:deliteful/list/Renderer}
+	 * @returns {Element}
 	 */
 	getEnclosingRow: function (node) {
 		if (this.type === "grid") {
@@ -633,7 +634,7 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 	 * that aren't categories.
 	 */
 	getNavigableRows: function () {
-		return this.querySelectorAll(this.rendererSelector);
+		return Array.from(this.querySelectorAll(this.rendererSelector));
 	},
 
 	/**
@@ -859,7 +860,7 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 	/**
 	 * Returns the renderer that currently has the focus or is
 	 * an ancestor of the focused node.
-	 * @return {module:deliteful/list/Renderer}
+	 * @return {Element}
 	 * @private
 	 */
 	_getFocusedRenderer: function () {

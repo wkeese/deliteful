@@ -4,8 +4,10 @@ import List from "deliteful/list/List";
 import { html } from "lit-html";
 
 register("d-configuration-item", [ HTMLElement, Widget ], {
-	render: function () {
+	initializeRendering: function () {
 		this.setAttribute("role", "row");
+		this.className = "d-list-item";
+
 		const div = this.ownerDocument.createElement("div");
 		div.setAttribute("role", "gridcell");
 		div.className = "d-list-cell";

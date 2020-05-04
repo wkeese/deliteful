@@ -10,6 +10,7 @@ register("d-data-form-item", [ HTMLElement, Widget ], {
 
 	initializeRendering: function () {
 		this.setAttribute("role", "row");
+		this.className = "d-list-item";
 		var renderNode = this.renderNode = this.ownerDocument.createElement("div");
 		renderNode.setAttribute("role", "gridcell");
 		renderNode.setAttribute("class", "d-list-cell");
