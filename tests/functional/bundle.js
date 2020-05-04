@@ -1,38 +1,4 @@
-// Loads all modules used by samples/functional tests, does other various setup.
-
-// Find the <script src="functional-tests.js"> tag, to get tests directory.
-let scripts = document.getElementsByTagName("script"), script, testDir;
-for (var i = 0; (script = scripts[i]); i++) {
-	var src = script.getAttribute("src"),
-		match = src && src.match(/(.*|^)boilerplate\.js/i);
-	if (match) {
-		// Sniff location of delite/tests directory relative to this test file.  testDir will be an empty string if
-		// it's the same directory, or a string including a slash, ex: "../", if the test is in a subdirectory.
-		testDir = match[1];
-
-		break;
-	}
-}
-
-// Add polyfills for IE.  Does this work from bundle.js?
-if (/Trident/.test(navigator.userAgent)) {
-	document.write("<script type='text/javascript' src='" + testDir + "ie-polyfills.js'></script>");
-	document.write("<script type='text/javascript' src='" + testDir +
-		"../node_modules/@webcomponents/custom-elements/custom-elements.min.js'></script>");
-}
-
-// For testing purposes, if dir=rtl is in the URL, then set dir=rtl on <html>.
-if (/dir=rtl/i.test(window.location.search)) {
-	document.documentElement.setAttribute("dir", "rtl");
-}
-
-// Similarly, if hc is in the URL search string, set d-hc class on <body>
-// (even if the computer isn't really in high contrast mode).
-if (/hc/.test(window.location.search)) {
-	domReady(function () {
-		document.body.classList.add("d-hc");
-	});
-}
+// Loads all modules used by samples/functional tests.
 
 // Map from module id to module.  Also makes sure modules tests need are in the bundle.
 const map = {
