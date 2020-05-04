@@ -12,11 +12,10 @@
 
 	<script type="text/javascript">
 		delitefulRequire([
-			"delite/register",
 			"dojo-dstore/Memory",
 			"dojo-dstore/Trackable",
-			"deliteful/samples/list/CustomCategoryList"
-		], function (register, Memory, Trackable, CustomCategoryList) {
+			"deliteful/samples/list/src/CustomCategoryList"
+		], function (Memory, Trackable, CustomCategoryList) {
 			var Store = Memory.createSubclass([ Trackable ], {});
 			var list = new CustomCategoryList();
 			list.source = new Store();

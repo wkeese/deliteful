@@ -13,17 +13,17 @@ const map = {
 	"deliteful/list/PageableList": require("deliteful/list/PageableList"),
 
 	// For List sample pages.
-	"deliteful/samples/list/CustomCategoryList": require("deliteful/samples/list/CustomCategoryList"),
-	"deliteful/samples/list/CustomItemList": require("deliteful/samples/list/CustomItemList"),
-	"deliteful/samples/list/DataForm": require("deliteful/samples/list/DataForm"),
-	"deliteful/samples/list/InputElementList": require("deliteful/samples/list/InputElementList"),
-	"deliteful/samples/list/NavigationList": require("deliteful/samples/list/NavigationList"),
+	"deliteful/samples/list/src/CustomCategoryList": require("deliteful/samples/list/src/CustomCategoryList"),
+	"deliteful/samples/list/src/CustomItemList": require("deliteful/samples/list/src/CustomItemList"),
+	"deliteful/samples/list/src/DataForm": require("deliteful/samples/list/src/DataForm"),
+	"deliteful/samples/list/src/InputElementList": require("deliteful/samples/list/src/InputElementList"),
+	"deliteful/samples/list/src/NavigationList": require("deliteful/samples/list/src/NavigationList"),
 
-	// For List functional test pages.
-	"deliteful/tests/functional/list/ComplexList": require("deliteful/tests/functional/list/ComplexList"),
-	"deliteful/tests/functional/list/CustomList1": require("deliteful/tests/functional/list/CustomList1"),
-	"deliteful/tests/functional/list/BookList": require("deliteful/tests/functional/list/BookList"),
-	"deliteful/tests/functional/list/BookTable": require("deliteful/tests/functional/list/BookTable")
+	// For list/src functional test pages.
+	"deliteful/tests/functional/list/src/ComplexList": require("deliteful/tests/functional/list/src/ComplexList"),
+	"deliteful/tests/functional/list/src/CustomList1": require("deliteful/tests/functional/list/src/CustomList1"),
+	"deliteful/tests/functional/list/src/BookList": require("deliteful/tests/functional/list/src/BookList"),
+	"deliteful/tests/functional/list/src/BookTable": require("deliteful/tests/functional/list/src/BookTable")
 };
 
 // Create Promise that resolves when the document has finished loading.

@@ -12,11 +12,10 @@
 
 	<script type="text/javascript">
 		delitefulRequire([
-			"delite/register",
 			"dojo-dstore/Memory",
 			"dojo-dstore/Trackable",
 			"deliteful/list/PageableList"
-		], function (register, Memory, Trackable, PageableList) {
+		], function (Memory, Trackable, PageableList) {
 			var Store = Memory.createSubclass([ Trackable ], {});
 			var list = new PageableList();
 			list.setAttribute("aria-label", "Sample pageable list with custom loader messages");
