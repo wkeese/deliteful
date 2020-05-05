@@ -394,7 +394,8 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 
 			return html`
 				<div role="row" aria-selected="${ifDefined(ariaSelected)}" class="${classMap(classes)}"
-					@click="${evt => this.handleSelection(evt, item, evt.currentTarget)}" d-keyboard-click="true">
+						@click="${evt => this.handleSelection(evt, item.__item, evt.currentTarget)}"
+						d-keyboard-click="true">
 					<div role="gridcell" class="d-list-cell" tabindex="-1">
 						<div class="d-list-item-icon ${item.iconclass}" aria-hidden="true" role="presentation"></div>
 						<div class="d-list-item-label">${item.label}</div>
@@ -422,7 +423,8 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 			return html`
 				<div role="${role}" aria-selected="${ifDefined(ariaSelected)}" class="${classMap(classes)}"
 						tabindex="-1"
-						@click="${evt => this.handleSelection(evt, item, evt.currentTarget)}" d-keyboard-click="true">
+						@click="${evt => this.handleSelection(evt, item.__item, evt.currentTarget)}"
+						d-keyboard-click="true">
 					<div class="d-list-item-icon ${item.iconclass}" aria-hidden="true" role="presentation"></div>
 					<div class="d-list-item-label">${item.label}</div>
 					<div class="d-spacer"></div>

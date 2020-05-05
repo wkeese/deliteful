@@ -1298,8 +1298,7 @@ registerSuite("list/PageableList", {
 
 			clickNextPageLoader(list).then(dfd.callback(function () {
 				list.deliver();
-				assert.strictEqual("item 10",
-					removeTabsAndReturns(list.getItemRendererByIndex(0).textContent));
+				assert.strictEqual(removeTabsAndReturns(list.querySelector("[role=row]").textContent), "item 10");
 			}));
 
 			return dfd;
