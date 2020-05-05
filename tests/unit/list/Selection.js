@@ -456,6 +456,7 @@ registerSuite("list/Selection", {
 			assert.strictEqual(thirdItem.getAttribute("aria-selected"), "false",
 				"A: aria-selected 'false' expected on third item");
 			assert.notInclude(thirdItem.className, "d-selected", "A: no d-selected class on third item");
+
 			list.selectionMode = "multiple";
 			list.deliver();
 
@@ -484,6 +485,7 @@ registerSuite("list/Selection", {
 			assert.strictEqual(thirdItem.getAttribute("aria-selected"), "false",
 				"B: aria-selected attribute expected on third item");
 			assert.notInclude(thirdItem.className, "d-selected", "B: d-selected class on third item");
+
 			list.selectionMode = "none";
 			list.deliver();
 

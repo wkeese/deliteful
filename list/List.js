@@ -282,6 +282,10 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 			];
 			this.rendererSelector = rendererSelectors.join(", ");
 		}
+
+		if (this.selectionMode === "none" && this.selectedItems.length) {
+			this.selectedItems = [];
+		}
 	},
 
 	/**
@@ -351,7 +355,7 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 
 		return html`
 			<div id="${widgetId}-container" role="${type}" class="${classMap(classes)}" tabindex="${tabIndex}"
-				 aria-readonly="true" aria-busy="${_busy}"
+				 aria-readonly="${ifDefined(type === "grid" ? "true" : undefined)}" aria-busy="${_busy}"
 				 aria-multiselectable="${ifDefined(selectionMode === "multiple" ? "true" : undefined)}">
 				 
 				 ${ repeat(renderItems, item => this.getIdentity(item), (item, idx) => html`
@@ -377,14 +381,14 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 	},
 
 	renderItem: function (item) {
-		const isSelected = this.selectionMode !== "none" && (this.type === "grid" || this.type === "listbox") &&
-			!!this.isSelected(item);
-
 		// According to https://www.w3.org/TR/wai-aria/states_and_properties#aria-selected
 		// aria-selected shouldn't be set on role=menuitem nodes.  That's what the future
 		// https://www.w3.org/TR/wai-aria-1.1/#aria-current role is for.  So set to undefined
-		// for that case, rather than "true" or "false", and leverage ifDefined().
-		const ariaSelected = (this.type === "grid" || this.type === "listbox") ? "" + isSelected : undefined;
+		// for that case, rather than true or false, and leverage ifDefined().
+		const isSelected = this.selectionMode !== "none" && (this.type === "grid" || this.type === "listbox") ?
+			!!this.isSelected(item) : undefined;
+
+		const ariaSelected = typeof isSelected === "boolean" ? "" + isSelected : undefined;
 
 		if (this.type === "grid") {
 			const classes = {
