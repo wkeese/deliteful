@@ -573,6 +573,18 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 		};
 	}),
 
+	itemRemoved: dcl.superCall(function (sup) {
+		return function (index, renderItems) {
+			// If the removed item is selected, then deselect it.
+			// Call selectFromEvent() to fire selection-change event.
+			const item = renderItems[index].__item;
+			if (this.isSelected(item)) {
+				this.selectFromEvent(null, item, null, true);
+			}
+
+			sup.apply(this, arguments);
+		};
+	}),
 
 	//////////// delite/Scrollable extension ///////////////////////////////////////
 

@@ -219,7 +219,7 @@ export default {
 					list.showNoItems = true;
 					list.deliver();
 					while (list.source.data.length > 0) {
-						list.source.remove(list.source.data[0].id);
+						list.source.removeSync(list.source.data[0].id);
 					}
 					list.deliver();
 					assert.match(list.textContent, /Nothing to show./, "list content");

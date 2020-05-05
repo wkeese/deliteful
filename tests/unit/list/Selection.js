@@ -192,7 +192,6 @@ var testHelper = {
 		list.on("selection-change", function (event) {
 			selectionChangeEvent = event;
 		});
-		console.log("fetchSync", list.source.fetchSync());
 		list.source.remove(list.source.fetchSync()[0].id);
 		assert.isNotNull(selectionChangeEvent, "selectionChangeEvent");
 		assert.strictEqual(selectionChangeEvent.oldValue.label, "item 1");
