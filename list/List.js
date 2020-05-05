@@ -442,10 +442,15 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 	 * @returns {Element}
 	 */
 	getEnclosingRenderer: function (node) {
-		while (node && node.parentNode && node.parentNode.id !== `${this.widgetId}-container`) {
-			node = node.parentNode;
+		const containerId = `${this.widgetId}-container`;
+		while (node && node.parentNode) {
+			if (node.parentNode.id === containerId) {
+				return node;
+			} else {
+				node = node.parentNode;
+			}
 		}
-		return node;
+		return null;
 	},
 
 	/**
