@@ -28,9 +28,9 @@ function removeTabsAndReturns (str) {
 function assertList (l, firstItemNumber, lastItemNumber, missingItemNumbers,
 					 previousPageLoader, nextPageLoader, hint) {
 	hint = hint || "";
-	var listContent = l.querySelector("[role=grid]");
+	var rows = l.querySelectorAll("[role=row]");
 	var numberOfItems = lastItemNumber - firstItemNumber + 1 - missingItemNumbers.length;
-	assert.strictEqual(listContent.children.length, numberOfItems, hint + " number of children");
+	assert.strictEqual(rows.length, numberOfItems, hint + " number of children");
 	if (previousPageLoader && l._previousPageLoaderVisible) {
 		assert.strictEqual(removeTabsAndReturns(l.previousPageLoader.labelNode.textContent),
 			"Click to load " + l.pageLength + " more items", hint + " previous page loader");
@@ -42,7 +42,7 @@ function assertList (l, firstItemNumber, lastItemNumber, missingItemNumbers,
 			}
 		}
 		assert.strictEqual(
-			removeTabsAndReturns(listContent.children[i].textContent), "item " + index, hint);
+			removeTabsAndReturns(rows[i].textContent), "item " + index, hint);
 	}
 	if (nextPageLoader && l._nextPageLoaderVisible) {
 		assert.strictEqual(removeTabsAndReturns(l.nextPageLoader.labelNode.textContent),
@@ -54,8 +54,8 @@ function assertCategorizedList (l, numberOfItems, firstItemNumber, previousPageL
 	var numberOfCategories = Math.floor((firstItemNumber + numberOfItems - 1) / 10)
 		- Math.floor(firstItemNumber / 10) + 1;
 	var lastCategory = null;
-	var listContent = l.querySelector("[role=grid]");
-	assert.strictEqual(numberOfCategories + numberOfItems, listContent.children.length, "number of children");
+	var rows = l.querySelectorAll("[role=row]");
+	assert.strictEqual(numberOfCategories + numberOfItems, rows.length, "number of children");
 	if (previousPageLoader && l._previousPageLoaderVisible) {
 		assert.strictEqual(removeTabsAndReturns(l.previousPageLoader.labelNode.textContent),
 			"Click to load " + l.pageLength + " more items", "previous page loader");
@@ -65,12 +65,12 @@ function assertCategorizedList (l, numberOfItems, firstItemNumber, previousPageL
 		var category = Math.floor(itemIndex / 10);
 		if (category !== lastCategory) {
 			lastCategory = category;
-			assert.strictEqual(removeTabsAndReturns(listContent.children[childIndex].textContent),
+			assert.strictEqual(removeTabsAndReturns(rows[childIndex].textContent),
 				"Category " + category);
 			childIndex++;
 		}
 		assert.strictEqual(
-			removeTabsAndReturns(listContent.children[childIndex].textContent), "item " + itemIndex);
+			removeTabsAndReturns(rows[childIndex].textContent), "item " + itemIndex);
 	}
 	if (nextPageLoader && l._nextPageLoaderVisible) {
 		assert.strictEqual(removeTabsAndReturns(l.nextPageLoader.labelNode.textContent),

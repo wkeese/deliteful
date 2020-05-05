@@ -244,7 +244,20 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 		}.bind(this));
 	},
 
+	// eslint-disable-next-line complexity
 	computeProperties: function (props) {
+		//	List attributes have been updated.
+		if ("renderItem" in props
+			|| (this._isCategorized()
+				&& ("categoryAttr" in props || "categoryFunc" in props || "renderCategory" in props))) {
+			if (this._dataLoaded) {
+				this._busy = true;
+
+				// trigger a reload of the list
+				this.notifyCurrentValue("source");
+			}
+		}
+
 		if (("renderItems" in props && this.renderItems) || "_busy" in props || "showNoItems" in props) {
 			this._displayedPanel = (this._busy) ? "loading-panel" :
 				(this.renderItems && this.renderItems.length > 0) ?

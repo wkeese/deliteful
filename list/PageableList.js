@@ -255,9 +255,16 @@ export default register("d-pageable-list", [ List ], /** @lends module:deliteful
 		}
 	}),
 
+	// eslint-disable-next-line complexity
 	computeProperties: function (props) {
-		this._displayedPanel = this._busy && this.hideOnPageLoad && !this.autoPaging ? "loading-panel" :
-			this.renderItems && this.renderItem.length > 0 ? "list" : this.showNoItems ? "no-items" : "none";
+		if (this.pageLength > 0) {
+			if ("_busy" in props || "hideOnPageLoad" in props || "autoPaging" in props || "showNoItems" in props
+				|| "_previousRecordsMayExist" in props || "_nextRecordsMayExist" in props) {
+				this._displayedPanel = (this._busy && this.hideOnPageLoad && !this.autoPaging) ? "loading-panel" :
+					(this.containerNode && this.containerNode.children.length > 0) ?
+						"list" : ((this.showNoItems) ? "no-items" : "none");
+			}
+		}
 
 		// Due to the string.substitute(), any change to any property could trigger a change to
 		// _previousPageButtonLabel, _nextPageButtonLabel.

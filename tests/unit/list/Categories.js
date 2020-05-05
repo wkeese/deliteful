@@ -344,21 +344,6 @@ registerSuite("list/Categories", {
 			checkItem(children[1], "item 4");
 			checkItem(children[2], "item 5");
 			checkItem(children[3], "item 6");
-			list._renderNewItems([
-				{ category: "A", label: "item 1" },
-				{ category: "A", label: "item 2" },
-				{ category: "A", label: "item 3" }
-			], true);
-			list.deliver();
-			children = list.querySelectorAll("[role=row]");
-			assert.strictEqual(children.length, 7);
-			checkCategory(children[0], "A");
-			checkItem(children[1], "item 1");
-			checkItem(children[2], "item 2");
-			checkItem(children[3], "item 3");
-			checkItem(children[4], "item 4");
-			checkItem(children[5], "item 5");
-			checkItem(children[6], "item 6");
 		}
 	},
 
