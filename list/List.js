@@ -385,15 +385,16 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 		// aria-selected shouldn't be set on role=menuitem nodes.  That's what the future
 		// https://www.w3.org/TR/wai-aria-1.1/#aria-current role is for.  So set to undefined
 		// for that case, rather than true or false, and leverage ifDefined().
-		const isSelected = this.selectionMode !== "none" && (this.type === "grid" || this.type === "listbox") ?
-			!!this.isSelected(item) : undefined;
+		const ariaSelected = this.selectionMode !== "none" && (this.type === "grid" || this.type === "listbox") ?
+			"" + !!this.isSelected(item) : undefined;
 
-		const ariaSelected = typeof isSelected === "boolean" ? "" + isSelected : undefined;
+		// On the other hand, menu items can get the selected CSS class.
+		const cssSelected = !!this.isSelected(item);
 
 		if (this.type === "grid") {
 			const classes = {
 				"d-list-item": true,
-				[this._cssClasses.selected]: isSelected
+				[this._cssClasses.selected]: cssSelected
 			};
 
 			return html`
@@ -421,7 +422,7 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 			const classes = {
 				"d-list-item": true,
 				"d-list-cell": true,
-				[this._cssClasses.selected]: isSelected
+				[this._cssClasses.selected]: cssSelected
 			};
 
 			return html`
