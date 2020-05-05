@@ -365,13 +365,13 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 	renderCategory: function (item) {
 		if (this.type === "grid") {
 			return html`
-				<div role="row" class="d-list-category">
+				<div role="row" class="d-list-category" .item="${item}">
 					<div role="columnheader" class="d-list-cell" tabindex="-1">${item.category}</div>
 				</div>
 			`;
 		} else {
 			return html`
-				<div role="heading" class="d-list-category">${item.category}</div>
+				<div role="heading" class="d-list-category" .item="${item}">${item.category}</div>
 			`;
 		}
 	},
@@ -395,7 +395,7 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 			return html`
 				<div role="row" aria-selected="${ifDefined(ariaSelected)}" class="${classMap(classes)}"
 						@click="${evt => this.handleSelection(evt, item.__item, evt.currentTarget)}"
-						d-keyboard-click="true">
+						d-keyboard-click="true" .item="${item}">
 					<div role="gridcell" class="d-list-cell" tabindex="-1">
 						<div class="d-list-item-icon ${item.iconclass}" aria-hidden="true" role="presentation"></div>
 						<div class="d-list-item-label">${item.label}</div>
@@ -424,7 +424,7 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 				<div role="${role}" aria-selected="${ifDefined(ariaSelected)}" class="${classMap(classes)}"
 						tabindex="-1"
 						@click="${evt => this.handleSelection(evt, item.__item, evt.currentTarget)}"
-						d-keyboard-click="true">
+						d-keyboard-click="true" .item="${item}">
 					<div class="d-list-item-icon ${item.iconclass}" aria-hidden="true" role="presentation"></div>
 					<div class="d-list-item-label">${item.label}</div>
 					<div class="d-spacer"></div>
@@ -574,17 +574,23 @@ export default register("d-list", mixins, /** @lends module:deliteful/list/List#
 	}),
 
 	itemRemoved: dcl.superCall(function (sup) {
-		return function (index, renderItems) {
+		return function (index, renderItems, keepSelection) {
 			// If the removed item is selected, then deselect it.
 			// Call selectFromEvent() to fire selection-change event.
 			const item = renderItems[index].__item;
-			if (this.isSelected(item)) {
+			if (this.isSelected(item) && !keepSelection) {
 				this.selectFromEvent(null, item, null, true);
 			}
 
 			sup.apply(this, arguments);
 		};
 	}),
+
+	// Override Store#itemMoved() so moved it is *not* deselected.
+	itemMoved: function (previousIndex, newIndex, renderItem, renderItems) {
+		this.itemRemoved(previousIndex, renderItems, true);
+		this.itemAdded(newIndex, renderItem, renderItems);
+	},
 
 	//////////// delite/Scrollable extension ///////////////////////////////////////
 

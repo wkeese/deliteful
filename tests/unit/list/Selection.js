@@ -205,17 +205,19 @@ var testHelper = {
 		list.selectionMode = "single";
 		list.deliver();
 
-		var firstItem = list.querySelector(`[role=${list.type}] > *:nth-child(1)`);
-		var secondItem = list.querySelector(`[role=${list.type}] > *:nth-child(2)`);
-		var thirdItem = list.querySelector(`[role=${list.type}] > *:nth-child(3)`);
-
 		// select first item
+		var firstItem = list.querySelector(`[role=${list.type}] > *:nth-child(1)`);
 		list.emit("keydown", { key: "Spacebar" }, firstItem);
 		list.emit("keyup", { key: "Spacebar" }, firstItem);
 		list.deliver();
-
 		assert(list.isSelected(firstItem.item), "item selected before move");
+
+		// move first item
+		var thirdItem = list.querySelector(`[role=${list.type}] > *:nth-child(3)`);
 		list.source.put(firstItem.item, { beforeId: thirdItem.item.id });
+		list.deliver();
+
+		var secondItem = list.querySelector(`[role=${list.type}] > *:nth-child(2)`);
 		assert(list.isSelected(secondItem.item), "item selected after move");
 		assert(secondItem.getAttribute("aria-selected"),
 			"item selected after move (aria-selected attribute)");
@@ -227,13 +229,13 @@ var testHelper = {
 		}
 		list.selectionMode = "single";
 		list.deliver();
-		assert(list.querySelector("[role=listbox]").className.indexOf("d-selectable") >= 0, "d-selectable class");
-		assert(list.querySelector("[role=listbox]").className.indexOf("d-multiselectable") === -1,
-			"d-multiselectable class");
-		assert.isFalse(list.querySelector("[role=listbox]").hasAttribute("aria-multiselectable"),
+		assert.include(list.querySelector(`[role=${list.type}]`).className, "d-selectable", "list class");
+		assert.notInclude(list.querySelector(`[role=${list.type}]`).className, "d-multiselectable",
+			"list class");
+		assert.isFalse(list.querySelector(`[role=${list.type}]`).hasAttribute("aria-multiselectable"),
 			"no aria-multiselectable attribute expected");
 		var firstItem = list.querySelector(`[role=${list.type}] > *:nth-child(1)`);
-		assert(firstItem.className.indexOf("d-selected") === -1, "no d-selected class expected");
+		assert.notInclude(firstItem.className, "d-selected", "firstItem class");
 		assert.strictEqual(firstItem.getAttribute("aria-selected"), "false",
 			"no aria-selected attribute 'false' expected on first item");
 
@@ -242,7 +244,7 @@ var testHelper = {
 		list.emit("keyup", { key: "Spacebar" }, firstItem);
 		list.deliver();
 
-		assert(firstItem.className.indexOf("d-selected") >= 0, "d-selected class expected");
+		assert.include(firstItem.className, "d-selected", "firstItem class");
 		assert.strictEqual(firstItem.getAttribute("aria-selected"), "true",
 			"aria-selected attribute 'true' expected on first item after selection");
 	},
@@ -253,13 +255,13 @@ var testHelper = {
 		}
 		list.selectionMode = "radio";
 		list.deliver();
-		assert(list.querySelector("[role=listbox]").className.indexOf("d-selectable") >= 0, "d-selectable class");
-		assert(list.querySelector("[role=listbox]").className.indexOf("d-multiselectable") === -1,
-			"d-multiselectable class");
+		assert.include(list.querySelector(`[role=${list.type}]`).className, "d-selectable", "list className");
+		assert.notInclude(list.querySelector(`[role=${list.type}]`).className, "d-multiselectable",
+			"list className");
 		assert.isFalse(list.hasAttribute("aria-multiselectable"),
 			"no aria-multiselectable attribute expected");
 		var firstItem = list.querySelector(`[role=${list.type}] > *:nth-child(1)`);
-		assert(firstItem.className.indexOf("d-selected") === -1, "no d-selected class expected");
+		assert.notInclude(firstItem.className, "d-selected", "no d-selected class expected");
 		assert.strictEqual(firstItem.getAttribute("aria-selected"), "false",
 			"no aria-selected attribute 'false' expected on first item");
 
@@ -268,7 +270,7 @@ var testHelper = {
 		list.emit("keyup", { key: "Spacebar" }, firstItem);
 		list.deliver();
 
-		assert(firstItem.className.indexOf("d-selected") >= 0, "d-selected class expected");
+		assert.include(firstItem.className, "d-selected", "d-selected class expected");
 		assert.strictEqual(firstItem.getAttribute("aria-selected"), "true",
 			"aria-selected attribute 'true' expected on first item after selection");
 	},
@@ -280,13 +282,13 @@ var testHelper = {
 			}
 			list.selectionMode = "multiple";
 			list.deliver();
-			assert(list.querySelector("[role=listbox]").className.indexOf("d-selectable") === -1, "d-selectable class");
-			assert(list.querySelector("[role=listbox]").className.indexOf("d-multiselectable") >= 0,
-				"d-multiselectable class");
-			assert.strictEqual(list.querySelector("[role=listbox]").getAttribute("aria-multiselectable"), "true",
+			assert.notInclude(list.querySelector(`[role=${list.type}]`).className, "d-selectable", "list class");
+			assert.include(list.querySelector(`[role=${list.type}]`).className, "d-multiselectable",
+				"list class");
+			assert.strictEqual(list.querySelector(`[role=${list.type}]`).getAttribute("aria-multiselectable"), "true",
 				"aria-multiselectable attribute expected");
 			var firstItem = list.querySelector(`[role=${list.type}] > *:nth-child(1)`);
-			assert(firstItem.className.indexOf("d-selected") === -1, "no d-selected class expected");
+			assert.notInclude(firstItem.className, "d-selected", "firstItem.className");
 			assert.strictEqual(firstItem.getAttribute("aria-selected"), "false",
 				"aria-selected attribute expected on first item");
 
@@ -295,7 +297,7 @@ var testHelper = {
 			list.emit("keyup", { key: "Spacebar" }, firstItem);
 			list.deliver();
 
-			assert(firstItem.className.indexOf("d-selected") >= 0, "d-selected class expected");
+			assert.include(firstItem.className, "d-selected", "firstItem.className");
 			assert.strictEqual(firstItem.getAttribute("aria-selected"), "true",
 				"aria-selected attribute expected on first item after selection");
 		}
@@ -349,14 +351,14 @@ registerSuite("list/Selection", {
 			list.on("selection-change", function (event) {
 				selectionChangeEvent = event;
 			});
-			assert.isTrue(firstItem.classList.contains("d-list-item"));
+			assert.include(firstItem.className, "d-list-item", "firstItem.className");
 
 			// Selection event on first item (no effect)
 			list.emit("keydown", { key: "Spacebar" }, firstItem);
 			list.emit("keyup", { key: "Spacebar" }, firstItem);
 
 			assert.isNull(selectionChangeEvent);
-			assert.isTrue(firstItem.classList.contains("d-list-item"));
+			assert.include(firstItem.className, "d-list-item", "firstItem.className again");
 		},
 
 		"revert selection to 'none' clears selection": function () {
@@ -414,10 +416,11 @@ registerSuite("list/Selection", {
 		"aria properties and classes when selection mode is none": function () {
 			list.selectionMode = "none";
 			list.deliver();
-			assert(list.querySelector("[role=listbox]").className.indexOf("d-selectable") === -1, "d-selectable class");
-			assert(list.querySelector("[role=listbox]").className.indexOf("d-multiselectable") === -1, "d-multiselectable class");
+			assert.notInclude(list.querySelector(`[role=${list.type}]`).className, "d-selectable", "list.className");
+			assert.notInclude(list.querySelector(`[role=${list.type}]`).className, "d-multiselectable",
+				"list.className");
 			var firstItem = list.querySelector(`[role=${list.type}] > *:nth-child(1)`);
-			assert(firstItem.className.indexOf("d-selected") === -1, "no d-selected class expected");
+			assert.notInclude(firstItem.className, "d-selected", "firstItem.className");
 		},
 
 		"aria properties and classes updated when selection mode is changed": function () {
@@ -425,94 +428,90 @@ registerSuite("list/Selection", {
 			list.deliver();
 
 			// select first item
+			var firstItem = list.querySelector(`[role=${list.type}] > *:nth-child(1)`);
 			list.emit("keydown", { key: "Spacebar" }, firstItem);
 			list.emit("keyup", { key: "Spacebar" }, firstItem);
 			list.deliver();
 
 			// list
-			assert.isFalse(list.querySelector("[role=listbox]").hasAttribute("aria-multiselectable"),
+			assert.isFalse(list.querySelector(`[role=${list.type}]`).hasAttribute("aria-multiselectable"),
 				"A: no aria-multiselectable attribute expected");
-			assert(list.querySelector("[role=listbox]").className.indexOf("d-multiselectable") === -1,
+			assert.notInclude(list.querySelector(`[role=${list.type}]`).className, "d-multiselectable",
 				"A: d-multiselectable class");
-			assert(list.querySelector("[role=listbox]").className.indexOf("d-selectable") >= 0, "A: d-selectable class");
+			assert.include(list.querySelector(`[role=${list.type}]`).className, "d-selectable", "A: d-selectable class");
 
 			// first item
-			var firstItem = list.querySelector(`[role=${list.type}] > *:nth-child(1)`);
 			assert.strictEqual(firstItem.getAttribute("aria-selected"), "true",
 				"A: aria-selected attribute expected on first item");
-			assert(firstItem.className.indexOf("d-selected") >= 0, "A: d-selected class on first item");
+			assert.include(firstItem.className, "d-selected", "A: d-selected class on first item");
 
 			// second item
 			var secondItem = list.querySelector(`[role=${list.type}] > *:nth-child(2)`);
 			assert.strictEqual(secondItem.getAttribute("aria-selected"), "false",
 				"A: aria-selected 'false' expected on second item");
-			assert(secondItem.className.indexOf("d-selected") === -1,
-				"A: no d-selected class on second item");
+			assert.notInclude(secondItem.className, "d-selected", "A: no d-selected class on second item");
 
 			// third item
 			var thirdItem = list.querySelector(`[role=${list.type}] > *:nth-child(3)`);
 			assert.strictEqual(thirdItem.getAttribute("aria-selected"), "false",
 				"A: aria-selected 'false' expected on third item");
-			assert(thirdItem.className.indexOf("d-selected") === -1,
-				"A: no d-selected class on third item");
+			assert.notInclude(thirdItem.className, "d-selected", "A: no d-selected class on third item");
 			list.selectionMode = "multiple";
 			list.deliver();
 
 			// list
-			assert(list.querySelector("[role=listbox]").hasAttribute("aria-multiselectable"),
+			assert(list.querySelector(`[role=${list.type}]`).hasAttribute("aria-multiselectable"),
 				"B: aria-multiselectable attribute expected");
-			assert(list.querySelector("[role=listbox]").className.indexOf("d-multiselectable") >= 0, "B: d-multiselectable class");
-			assert(list.querySelector("[role=listbox]").className.indexOf("d-selectable") === -1, "B: d-selectable class");
+			assert.include(list.querySelector(`[role=${list.type}]`).className, "d-multiselectable",
+				"B: d-multiselectable class");
+			assert.notInclude(list.querySelector(`[role=${list.type}]`).className, "d-selectable",
+				"B: d-selectable class");
 
 			// first item
 			var firstItem = list.querySelector(`[role=${list.type}] > *:nth-child(1)`);
 			assert.strictEqual(firstItem.getAttribute("aria-selected"), "true",
 				"B: aria-selected attribute expected on first item");
-			assert(firstItem.className.indexOf("d-selected") >= 0,
-				"B: d-selected class on first item");
+			assert.include(firstItem.className, "d-selected", "B: d-selected class on first item");
 
 			// second item
 			var secondItem = list.querySelector(`[role=${list.type}] > *:nth-child(2)`);
 			assert.strictEqual(secondItem.getAttribute("aria-selected"), "false",
 				"B: aria-selected attribute expected on second item");
-			assert(secondItem.className.indexOf("d-selected") === -1,
-				"B: d-selected class on second item");
+			assert.notInclude(secondItem.className, "d-selected", "B: d-selected class on second item");
 
 			// third item
 			var thirdItem = list.querySelector(`[role=${list.type}] > *:nth-child(3)`);
 			assert.strictEqual(thirdItem.getAttribute("aria-selected"), "false",
 				"B: aria-selected attribute expected on third item");
-			assert(thirdItem.className.indexOf("d-selected") === -1,
-				"B: d-selected class on third item");
+			assert.notInclude(thirdItem.className, "d-selected", "B: d-selected class on third item");
 			list.selectionMode = "none";
 			list.deliver();
 
 			// list
-			assert.isFalse(list.querySelector("[role=listbox]").hasAttribute("aria-multiselectable"),
+			assert.isFalse(list.querySelector(`[role=${list.type}]`).hasAttribute("aria-multiselectable"),
 				"C: no aria-multiselectable attribute expected");
-			assert(list.querySelector("[role=listbox]").className.indexOf("d-multiselectable") === -1,
+			assert.notInclude(list.querySelector(`[role=${list.type}]`).className, "d-multiselectable",
 				"C: d-multiselectable class");
-			assert(list.querySelector("[role=listbox]").className.indexOf("d-selectable") === -1, "C: d-selectable class");
+			assert.notInclude(list.querySelector(`[role=${list.type}]`).className, "d-selectable",
+				"C: d-selectable class");
 
 			// first item
 			var firstItem = list.querySelector(`[role=${list.type}] > *:nth-child(1)`);
 			assert.isFalse(firstItem.hasAttribute("aria-selected"),
 				"C: no aria-selected attribute expected on first item");
-			assert(firstItem.className.indexOf("d-selected") === -1,
-				"C: d-selected class on first item");
+			assert.notInclude(firstItem.className, "d-selected", "C: d-selected class on first item");
 
 			// second item
 			var secondItem = list.querySelector(`[role=${list.type}] > *:nth-child(2)`);
 			assert.isFalse(secondItem.hasAttribute("aria-selected"),
 				"C: no aria-selected attribute expected on second item");
-			assert(secondItem.className.indexOf("d-selected") === -1,
-				"C: d-selected class on second item");
+			assert.notInclude(secondItem.className, "d-selected", "C: d-selected class on second item");
+
 			// third item
 			var thirdItem = list.querySelector(`[role=${list.type}] > *:nth-child(3)`);
 			assert.isFalse(thirdItem.hasAttribute("aria-selected"),
 				"C: no aria-selected attribute expected on third item");
-			assert(thirdItem.className.indexOf("d-selected") === -1,
-				"C: d-selected class on third item");
+			assert.notInclude(thirdItem.className, "d-selected", "C: d-selected class on third item");
 		}
 	},
 
