@@ -25,11 +25,11 @@ var testHelper = {
 		assert.isTrue(firstItem.classList.contains("d-list-item"));
 
 		// Selection event on first item (select)
-		firstItem.emit("keydown", { key: "Spacebar" });
-		firstItem.emit("keyup", { key: "Spacebar" });
+		list.emit("keydown", { key: "Spacebar" }, firstItem);
+		list.emit("keyup", { key: "Spacebar" }, firstItem);
 		list.deliver();
 
-		assert.isNotNull(selectionChangeEvent);
+		assert.isNotNull(selectionChangeEvent, "selectionChangeEvent 1");
 		assert.deepEqual(selectionChangeEvent.oldValue, [], "event1 old selection");
 		assert.deepEqual(selectionChangeEvent.newValue, [ list.getItemRendererByIndex(0).item ], "event1 new select");
 		assert.strictEqual(selectionChangeEvent.renderer, firstItem, "event1 renderer");
@@ -39,11 +39,11 @@ var testHelper = {
 		assert.strictEqual(secondItem.getAttribute("aria-selected"), "false");
 
 		// Selection event on second item (select)
-		secondItem.emit("keydown", { key: "Spacebar" });
-		secondItem.emit("keyup", { key: "Spacebar" });
+		list.emit("keydown", { key: "Spacebar" }, secondItem);
+		list.emit("keyup", { key: "Spacebar" }, secondItem);
 		list.deliver();
 
-		assert.isNotNull(selectionChangeEvent);
+		assert.isNotNull(selectionChangeEvent, "selectionChangeEvent 2");
 		assert.deepEqual(selectionChangeEvent.oldValue,
 			[ list.getItemRendererByIndex(0).item ], "event2 oldValue");
 		assert.deepEqual(selectionChangeEvent.newValue,
@@ -55,11 +55,11 @@ var testHelper = {
 		assert.strictEqual(secondItem.getAttribute("aria-selected"), "true");
 
 		// Selection event on first item (deselect)
-		firstItem.emit("keydown", { key: "Spacebar" });
-		firstItem.emit("keyup", { key: "Spacebar" });
+		list.emit("keydown", { key: "Spacebar" }, firstItem);
+		list.emit("keyup", { key: "Spacebar" }, firstItem);
 		list.deliver();
 
-		assert.isNotNull(selectionChangeEvent);
+		assert.isNotNull(selectionChangeEvent, "selectionChangeEvent 3");
 		assert.deepEqual(selectionChangeEvent.oldValue,
 			[ list.getItemRendererByIndex(0).item, list.getItemRendererByIndex(1).item ], "event3 oldValue");
 		assert.deepEqual(selectionChangeEvent.newValue,
@@ -67,9 +67,9 @@ var testHelper = {
 		assert.strictEqual(selectionChangeEvent.renderer, firstItem, "event3 renderer");
 		assert.strictEqual(selectionChangeEvent.triggerEvent.key, "Spacebar", "event3 triggerEvent");
 		selectionChangeEvent = null;
-		//
-		assert.strictEqual(firstItem.getAttribute("aria-selected"), "false");
-		assert.strictEqual(secondItem.getAttribute("aria-selected"), "true");
+
+		assert.strictEqual(firstItem.getAttribute("aria-selected"), "false", "firstItem aria-selected");
+		assert.strictEqual(secondItem.getAttribute("aria-selected"), "true", "secondItem aria-selected");
 	},
 
 	"selectionMode 'single'": function (isListbox) {
@@ -87,8 +87,8 @@ var testHelper = {
 		assert.isTrue(firstItem.classList.contains("d-list-item"));
 
 		// Selection event on first item (select)
-		firstItem.emit("keydown", { key: "Spacebar" });
-		firstItem.emit("keyup", { key: "Spacebar" });
+		list.emit("keydown", { key: "Spacebar" }, firstItem);
+		list.emit("keyup", { key: "Spacebar" }, firstItem);
 		list.deliver();
 
 		assert.isNotNull(selectionChangeEvent);
@@ -101,8 +101,8 @@ var testHelper = {
 		assert.strictEqual(secondItem.getAttribute("aria-selected"), "false");
 
 		// Selection event on second item (select)
-		secondItem.emit("keydown", { key: "Spacebar" });
-		secondItem.emit("keyup", { key: "Spacebar" });
+		list.emit("keydown", { key: "Spacebar" }, secondItem);
+		list.emit("keyup", { key: "Spacebar" }, secondItem);
 		list.deliver();
 
 		assert.isNotNull(selectionChangeEvent);
@@ -116,8 +116,8 @@ var testHelper = {
 		assert.strictEqual(secondItem.getAttribute("aria-selected"), "true");
 
 		// Selection event on second item (deselect)
-		secondItem.emit("keydown", { key: "Spacebar" });
-		secondItem.emit("keyup", { key: "Spacebar" });
+		list.emit("keydown", { key: "Spacebar" }, secondItem);
+		list.emit("keyup", { key: "Spacebar" }, secondItem);
 		list.deliver();
 
 		assert.isNotNull(selectionChangeEvent);
@@ -145,8 +145,8 @@ var testHelper = {
 		assert.isTrue(firstItem.classList.contains("d-list-item"));
 
 		// Selection event on first item (select)
-		firstItem.emit("keydown", { key: "Spacebar" });
-		firstItem.emit("keyup", { key: "Spacebar" });
+		list.emit("keydown", { key: "Spacebar" }, firstItem);
+		list.emit("keyup", { key: "Spacebar" }, firstItem);
 		list.deliver();
 
 		assert.isNotNull(selectionChangeEvent);
@@ -159,8 +159,8 @@ var testHelper = {
 		assert.strictEqual(secondItem.getAttribute("aria-selected"), "false");
 
 		// Selection event on second item (select)
-		secondItem.emit("keydown", { key: "Spacebar" });
-		secondItem.emit("keyup", { key: "Spacebar" });
+		list.emit("keydown", { key: "Spacebar" }, secondItem);
+		list.emit("keyup", { key: "Spacebar" }, secondItem);
 		list.deliver();
 
 		assert.isNotNull(selectionChangeEvent);
@@ -173,8 +173,8 @@ var testHelper = {
 		assert.strictEqual(secondItem.getAttribute("aria-selected"), "true");
 
 		// Selection event on second item (does not deselect)
-		secondItem.emit("keydown", { key: "Spacebar" });
-		secondItem.emit("keyup", { key: "Spacebar" });
+		list.emit("keydown", { key: "Spacebar" }, secondItem);
+		list.emit("keyup", { key: "Spacebar" }, secondItem);
 		list.deliver();
 
 		assert.isNull(selectionChangeEvent);
@@ -192,8 +192,8 @@ var testHelper = {
 		var firstItem = list.querySelector("[role=listbox]").children[0];
 
 		// select first item
-		firstItem.emit("keydown", { key: "Spacebar" });
-		firstItem.emit("keyup", { key: "Spacebar" });
+		list.emit("keydown", { key: "Spacebar" }, firstItem);
+		list.emit("keyup", { key: "Spacebar" }, firstItem);
 		list.deliver();
 
 		// now listen to selection-change event and remove the selected item from the store
@@ -216,8 +216,8 @@ var testHelper = {
 		var thirdItem = list.querySelector("[role=listbox]").children[2];
 
 		// select first item
-		firstItem.emit("keydown", { key: "Spacebar" });
-		firstItem.emit("keyup", { key: "Spacebar" });
+		list.emit("keydown", { key: "Spacebar" }, firstItem);
+		list.emit("keyup", { key: "Spacebar" }, firstItem);
 		list.deliver();
 
 		assert(list.isSelected(firstItem.item), "item selected before move");
@@ -245,8 +245,8 @@ var testHelper = {
 			"no aria-selected attribute 'false' expected on first item");
 
 		// select first item
-		firstItem.emit("keydown", { key: "Spacebar" });
-		firstItem.emit("keyup", { key: "Spacebar" });
+		list.emit("keydown", { key: "Spacebar" }, firstItem);
+		list.emit("keyup", { key: "Spacebar" }, firstItem);
 		list.deliver();
 
 		assert(firstItem.className.indexOf("d-selected") >= 0, "d-selected class expected");
@@ -271,8 +271,8 @@ var testHelper = {
 			"no aria-selected attribute 'false' expected on first item");
 
 		// select first item
-		firstItem.emit("keydown", { key: "Spacebar" });
-		firstItem.emit("keyup", { key: "Spacebar" });
+		list.emit("keydown", { key: "Spacebar" }, firstItem);
+		list.emit("keyup", { key: "Spacebar" }, firstItem);
 		list.deliver();
 
 		assert(firstItem.className.indexOf("d-selected") >= 0, "d-selected class expected");
@@ -298,8 +298,8 @@ var testHelper = {
 				"aria-selected attribute expected on first item");
 
 			// select first item
-			firstItem.emit("keydown", { key: "Spacebar" });
-			firstItem.emit("keyup", { key: "Spacebar" });
+			list.emit("keydown", { key: "Spacebar" }, firstItem);
+			list.emit("keyup", { key: "Spacebar" }, firstItem);
 			list.deliver();
 
 			assert(firstItem.className.indexOf("d-selected") >= 0, "d-selected class expected");
@@ -359,8 +359,8 @@ registerSuite("list/Selection", {
 			assert.isTrue(firstItem.classList.contains("d-list-item"));
 
 			// Selection event on first item (no effect)
-			firstItem.emit("keydown", { key: "Spacebar" });
-			firstItem.emit("keyup", { key: "Spacebar" });
+			list.emit("keydown", { key: "Spacebar" }, firstItem);
+			list.emit("keyup", { key: "Spacebar" }, firstItem);
 
 			assert.isNull(selectionChangeEvent);
 			assert.isTrue(firstItem.classList.contains("d-list-item"));
@@ -433,8 +433,8 @@ registerSuite("list/Selection", {
 			var firstItem = list.querySelector("[role=listbox]").children[0];
 
 			// select first item
-			firstItem.emit("keydown", { key: "Spacebar" });
-			firstItem.emit("keyup", { key: "Spacebar" });
+			list.emit("keydown", { key: "Spacebar" }, firstItem);
+			list.emit("keyup", { key: "Spacebar" }, firstItem);
 			list.deliver();
 
 			// list

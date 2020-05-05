@@ -16,6 +16,7 @@ import "./List/List.css";
 
 // Used in template.
 import "../ProgressIndicator";
+import "delite/a11yclick";
 
 /**
  * A widget that renders a scrollable list of items.
