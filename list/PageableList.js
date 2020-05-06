@@ -423,7 +423,7 @@ export default register("d-pageable-list", [ List ], /** @lends module:deliteful
 			}
 		} else {
 			const idPage = this._idPages.pop();
-			this.renderItems = this.renderItems.slice(0, idPage.length);
+			this.renderItems = this.renderItems.slice(0, this.renderItems.length - idPage.length);
 			this.lastLoaded -= idPage.length;
 			if (idPage.length) {
 				this._nextRecordsMayExist = true;
