@@ -245,13 +245,13 @@ export default register("d-pageable-list", [ List ], /** @lends module:deliteful
 
 	previousPageLoader: dcl.prop({
 		get: function () {
-			return this.querySelector("d-list-loader");
+			return this.querySelector(".d-list-loader");
 		}
 	}),
 
 	nextPageLoader: dcl.prop({
 		get: function () {
-			return this.querySelector("d-list-loader:nth-child(2)");
+			return this.querySelector(".d-list-loader:last-child");
 		}
 	}),
 
