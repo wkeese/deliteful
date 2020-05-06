@@ -620,6 +620,69 @@ export default register("d-pageable-list", [ List ], /** @lends module:deliteful
 		}
 	},
 
+	//////////// Store method overriding ///////////////////////////////////////
+
+	itemRemoved: dcl.superCall(function (sup) {
+		return function (index, renderItems) {
+			if (this.pageLength > 0) {
+				if (this._firstLoaded <= index && index <= this._lastLoaded) {
+					// Remove the item id in _idPages.
+					this._updateIdPages(false, index);
+
+					// Remove the item from this.renderItems[].
+					sup.call(this, index - this._firstLoaded, renderItems);
+				}
+				if (index < this._firstLoaded) {
+					this._firstLoaded--;
+				}
+				if (index <= this._lastLoaded) {
+					this._lastLoaded--;
+				}
+				if (this._firstLoaded === 0 && this._previousRecordsMayExist) {
+					this._previousRecordsMayExist = false;
+				}
+			} else {
+				sup.apply(this, arguments);
+			}
+		};
+	}),
+
+	itemAdded: dcl.superCall(function (sup) {
+		return function (index, renderItem, renderItems) {
+			if (this.pageLength > 0) {
+				if (this._firstLoaded < index && index <= this._lastLoaded) {
+					// Add the item id in _idPages
+					this._updateIdPages(true, index, this.getIdentity(renderItem));
+					this._lastLoaded++;
+
+					// Add the item to this.renderItems[].
+					sup.call(this, index - this._firstLoaded, renderItem, renderItems);
+				} else if (index <= this._firstLoaded) {
+					this._firstLoaded++;
+					this._lastLoaded++;
+					this._previousRecordsMayExist = true;
+				} else if (index > this._lastLoaded) {
+					this._nextRecordsMayExist = true;
+				}
+			} else {
+				sup.apply(this, arguments);
+			}
+		};
+	}),
+
+	itemUpdated: dcl.superCall(function (sup) {
+		return function (index, renderItem, renderItems) {
+			if (this.pageLength > 0) {
+				if (this._firstLoaded < index && index <= this._lastLoaded) {
+					// Update the item in this.renderItems[].
+					sup.call(this, index - this._firstLoaded, renderItem, renderItems);
+				}
+			} else {
+				sup.apply(this, arguments);
+			}
+		};
+	}),
+
 	//////////// List methods overriding ///////////////////////////////////////
 
 	_empty: function () {
