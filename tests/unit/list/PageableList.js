@@ -327,8 +327,8 @@ var testHelpers = {
 		assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.textContent),
 			"Click to load 23 more items", "A");
 		clickNextPageLoader(list).then(dfd.rejectOnError(function () {
-			assert.strictEqual(list.querySelector("[role=grid]").children.length, 48, "B: number of list children");
 			list.deliver();
+			assert.strictEqual(list.querySelector("[role=grid]").children.length, 48, "B: number of list children");
 			assert.strictEqual(removeTabsAndReturns(list.querySelector("[role=grid]").children[0].textContent), "item 0", "B");
 			assert.strictEqual(removeTabsAndReturns(list.querySelector("[role=grid]").children[1].textContent), "item A", "B");
 			for (var k = 2; k <= 22; k++) {
@@ -1224,8 +1224,7 @@ registerSuite("list/PageableList", {
 				// after second page is loaded
 				assertList(list, 0, 38, [], false, false);
 				// verify that loading panel is not displayed
-				assert.isNotNull(list.querySelector(".d-list-loading-panel[d-shown='false']"),
-					"loading panel should not be visible");
+				assert.isNull(list.querySelector(".d-list-loading-panel"), "loading panel should not be visible");
 			}));
 
 			return dfd;
@@ -1249,34 +1248,28 @@ registerSuite("list/PageableList", {
 			list.deliver();
 
 			// verify that loading panel is displayed, list and prev/next loader not visible.
-			assert.isNotNull(list.querySelector(".d-list-loading-panel[d-shown='true']"),
-				"loading panel should be visible");
-			assert.isNotNull(list.querySelector(".d-list-container[d-shown='false']"),
+			assert.isNotNull(list.querySelector(".d-list-loading-panel"), "loading panel should be visible");
+			assert.isNull(list.querySelector(".d-list-container"),
 				"list querySelector([role=grid]) should not be visible");
-			assert.isNotNull(list.querySelector(".d-list-previous-loader[d-shown='false']"),
-				"previous loader should not be visible");
-			assert.isNotNull(list.querySelector(".d-list-next-loader[d-shown='false']"),
-				"next loader should not be visible");
+			assert.isNull(list.querySelector(".d-list-previous-loader"), "previous loader should not be visible");
+			assert.isNull(list.querySelector(".d-list-next-loader"), "next loader should not be visible");
 			list.hideOnPageLoad = false;
 			list.deliver();
 
 			// verify that loading panel and prev loader are not shown,
 			// list and next loader are visible when busy equals to true.
-			assert.isNotNull(list.querySelector(".d-list-loading-panel[d-shown='false']"),
+			assert.isNull(list.querySelector(".d-list-loading-panel"),
 				"loading panel should not be visible");
-			assert.isNotNull(list.querySelector(".d-list-container[d-shown='true']"),
+			assert.isNotNull(list.querySelector(".d-list-container"),
 				"list querySelector([role=grid]) should be visible");
-			assert.isNotNull(list.querySelector(".d-list-previous-loader[d-shown='false']"),
-				"previous loader should not be visible");
-			assert.isNotNull(list.querySelector(".d-list-next-loader[d-shown='true']"),
-				"next loader should be visible");
+			assert.isNull(list.querySelector(".d-list-previous-loader"), "previous loader should not be visible");
+			assert.isNotNull(list.querySelector(".d-list-next-loader"), "next loader should be visible");
 			list._busy = false;
 
 			clickNextPageLoader(list).then(dfd.callback(function () {
 				list.deliver();
 				// verify that loading panel is not displayed
-				assert.isNotNull(list.querySelector(".d-list-loading-panel[d-shown='false']"),
-					"loading panel should be visible");
+				assert.isNull(list.querySelector(".d-list-loading-panel"), "loading panel should not be visible");
 			}));
 
 			return dfd;
