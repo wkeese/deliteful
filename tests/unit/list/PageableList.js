@@ -32,7 +32,7 @@ function assertList (l, firstItemNumber, lastItemNumber, missingItemNumbers,
 	var numberOfItems = lastItemNumber - firstItemNumber + 1 - missingItemNumbers.length;
 	assert.strictEqual(rows.length, numberOfItems, hint + " number of children");
 	if (previousPageLoader && l._previousPageLoaderVisible) {
-		assert.strictEqual(removeTabsAndReturns(l.previousPageLoader.labelNode.textContent),
+		assert.strictEqual(removeTabsAndReturns(l.previousPageLoader.textContent),
 			"Click to load " + l.pageLength + " more items", hint + " previous page loader");
 	}
 	for (var i = 0, index = firstItemNumber; i < numberOfItems; i++, index++) {
@@ -45,7 +45,7 @@ function assertList (l, firstItemNumber, lastItemNumber, missingItemNumbers,
 			removeTabsAndReturns(rows[i].textContent), "item " + index, hint);
 	}
 	if (nextPageLoader && l._nextPageLoaderVisible) {
-		assert.strictEqual(removeTabsAndReturns(l.nextPageLoader.labelNode.textContent),
+		assert.strictEqual(removeTabsAndReturns(l.nextPageLoader.textContent),
 			"Click to load " + l.pageLength + " more items", hint + " previous page loader");
 	}
 }
@@ -57,7 +57,7 @@ function assertCategorizedList (l, numberOfItems, firstItemNumber, previousPageL
 	var rows = l.querySelectorAll("[role=row]");
 	assert.strictEqual(numberOfCategories + numberOfItems, rows.length, "number of children");
 	if (previousPageLoader && l._previousPageLoaderVisible) {
-		assert.strictEqual(removeTabsAndReturns(l.previousPageLoader.labelNode.textContent),
+		assert.strictEqual(removeTabsAndReturns(l.previousPageLoader.textContent),
 			"Click to load " + l.pageLength + " more items", "previous page loader");
 	}
 	for (var childIndex = 0, itemIndex = firstItemNumber; itemIndex < firstItemNumber + numberOfItems;
@@ -73,7 +73,7 @@ function assertCategorizedList (l, numberOfItems, firstItemNumber, previousPageL
 			removeTabsAndReturns(rows[childIndex].textContent), "item " + itemIndex);
 	}
 	if (nextPageLoader && l._nextPageLoaderVisible) {
-		assert.strictEqual(removeTabsAndReturns(l.nextPageLoader.labelNode.textContent),
+		assert.strictEqual(removeTabsAndReturns(l.nextPageLoader.textContent),
 			"Click to load " + l.pageLength + " more items", "previous page loader");
 	}
 }
@@ -324,7 +324,7 @@ var testHelpers = {
 		}
 		assert.strictEqual(removeTabsAndReturns(list.querySelector("[role=grid]").children[23].textContent), "item B", "A");
 		assert.strictEqual(removeTabsAndReturns(list.querySelector("[role=grid]").children[24].textContent), "item 22", "A");
-		assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.labelNode.textContent),
+		assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.textContent),
 			"Click to load 23 more items", "A");
 		clickNextPageLoader(list).then(dfd.rejectOnError(function () {
 			assert.strictEqual(list.querySelector("[role=grid]").children.length, 48, "B: number of list children");
@@ -340,7 +340,7 @@ var testHelpers = {
 				assert.strictEqual(removeTabsAndReturns(list.querySelector("[role=grid]").children[l].textContent),
 					"item " + (l - 2), "B");
 			}
-			assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.labelNode.textContent),
+			assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.textContent),
 				"Click to load 23 more items", "B");
 			// Add an item
 			list.source.add({ id: "C", label: "item C" }, { beforeId: 23 });
@@ -359,31 +359,31 @@ var testHelpers = {
 				assert.strictEqual(removeTabsAndReturns(list.querySelector("[role=grid]").children[n].textContent),
 					"item " + (n - 3), "C");
 			}
-			assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.labelNode.textContent),
+			assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.textContent),
 				"Click to load 23 more items", "C");
 			clickNextPageLoader(list).then(dfd.rejectOnError(function () {
 				list.deliver();
 				assert.strictEqual(list.querySelector("[role=grid]").children.length, 47, "D: number of list children");
-				assert.strictEqual(removeTabsAndReturns(list.previousPageLoader.labelNode.textContent),
+				assert.strictEqual(removeTabsAndReturns(list.previousPageLoader.textContent),
 					"Click to load 23 more items",
 					"C: previous page loader");
 				assert.strictEqual(removeTabsAndReturns(list.querySelector("[role=grid]").children[0].textContent), "item C", "C");
 				assert.strictEqual(removeTabsAndReturns(list.querySelector("[role=grid]").children[46].textContent),
 					"item 68", "C");
-				assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.labelNode.textContent),
+				assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.textContent),
 					"Click to load 23 more items",
 					"C: next page loader");
 				clickPreviousPageLoader(list).then(dfd.rejectOnError(function () {
 					list.deliver();
 					assert.strictEqual(list.querySelector("[role=grid]").children.length, 47, "D: number of list children");
-					assert.strictEqual(removeTabsAndReturns(list.previousPageLoader.labelNode.textContent),
+					assert.strictEqual(removeTabsAndReturns(list.previousPageLoader.textContent),
 						"Click to load 23 more items",
 						"D: previous page loader");
 					assert.strictEqual(removeTabsAndReturns(list.querySelector("[role=grid]").children[0].textContent),
 						"item 1", "D");
 					assert.strictEqual(removeTabsAndReturns(list.querySelector("[role=grid]").children[46].textContent),
 						"item 45", "D");
-					assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.labelNode.textContent),
+					assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.textContent),
 						"Click to load 23 more items",
 						"D: next page loader");
 					clickPreviousPageLoader(list).then(dfd.callback(function () {
@@ -395,7 +395,7 @@ var testHelpers = {
 							"item A", "E");
 						assert.strictEqual(removeTabsAndReturns(list.querySelector("[role=grid]").children[24].textContent),
 							"item 22", "E");
-						assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.labelNode.textContent),
+						assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.textContent),
 							"Click to load 23 more items",
 							"E: next page loader");
 					}));
@@ -425,14 +425,14 @@ var testHelpers = {
 			[ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 ]);
 		assert.strictEqual(list._idPages[0].length, 23, "A: number of items in page");
 		assert.strictEqual(list.querySelector("[role=grid]").children.length, 23, "A: number of list children");
-		assert.strictEqual(removeTabsAndReturns(list.previousPageLoader.labelNode.textContent),
+		assert.strictEqual(removeTabsAndReturns(list.previousPageLoader.textContent),
 			"Click to load 23 more items",
 			"A (previous page loader)");
 		for (var j = 0; j < 23; j++) {
 			assert.strictEqual(
 				removeTabsAndReturns(list.querySelector("[role=grid]").children[j].textContent), "item " + j, "A");
 		}
-		assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.labelNode.textContent),
+		assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.textContent),
 			"Click to load 23 more items",
 			"A (next page loader)");
 		clickPreviousPageLoader(list).then(dfd.callback(function () {
@@ -443,7 +443,7 @@ var testHelpers = {
 				assert.strictEqual(removeTabsAndReturns(list.querySelector("[role=grid]").children[k].textContent),
 					"item " + (k - 1), "B");
 			}
-			assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.labelNode.textContent),
+			assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.textContent),
 				"Click to load 23 more items", "B");
 		}));
 
@@ -462,7 +462,7 @@ var testHelpers = {
 		list.placeAt(document.body);
 		list.deliver();
 		assert.strictEqual(list.querySelector("[role=grid]").children.length, 23, "0: number of list children");
-		assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.labelNode.textContent),
+		assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.textContent),
 			"Click to load 23 more items",
 			"0: last children is next page loader");
 		clickNextPageLoader(list).then(dfd.rejectOnError(function () {
@@ -479,7 +479,7 @@ var testHelpers = {
 				assert.strictEqual(
 					removeTabsAndReturns(list.querySelector("[role=grid]").children[j].textContent), "item " + j, "A");
 			}
-			assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.labelNode.textContent),
+			assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.textContent),
 				"Click to load 23 more items",
 				"A (next page loader)");
 			clickNextPageLoader(list).then(dfd.callback(function () {
@@ -515,7 +515,7 @@ var testHelpers = {
 		clickNextPageLoader(list).then(dfd.rejectOnError(function () {
 			list.deliver();
 			assert.strictEqual(list.querySelector("[role=grid]").children.length, 23, "B: list number of children");
-			assert.strictEqual(removeTabsAndReturns(list.previousPageLoader.labelNode.textContent),
+			assert.strictEqual(removeTabsAndReturns(list.previousPageLoader.textContent),
 				"Click to load 23 more items",
 				"B: previous page loader");
 			assert.strictEqual(removeTabsAndReturns(list.querySelector("[role=grid]").children[0].textContent), "item A", "B");
@@ -523,14 +523,14 @@ var testHelpers = {
 				assert.strictEqual(removeTabsAndReturns(list.querySelector("[role=grid]").children[j].textContent),
 					"item " + (j + 22), "B");
 			}
-			assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.labelNode.textContent),
+			assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.textContent),
 				"Click to load 23 more items",
 				"B: next page loader");
 			list.source.add({ id: "B", label: "item B" }, { beforeId: 22 });
 			clickPreviousPageLoader(list).then(dfd.callback(function () {
 				list.deliver();
 				assert.strictEqual(list.querySelector("[role=grid]").children.length, 23, "C: list number of children");
-				assert.strictEqual(removeTabsAndReturns(list.previousPageLoader.labelNode.textContent),
+				assert.strictEqual(removeTabsAndReturns(list.previousPageLoader.textContent),
 					"Click to load 23 more items",
 					"C: previous page loader");
 				for (var k = 0; k < 21; k++) {
@@ -541,7 +541,7 @@ var testHelpers = {
 					"item B", "C");
 				assert.strictEqual(removeTabsAndReturns(list.querySelector("[role=grid]").children[22].textContent),
 					"item 22", "C");
-				assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.labelNode.textContent),
+				assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.textContent),
 					"Click to load 23 more items",
 					"C: next page loader");
 			}));
@@ -1169,7 +1169,7 @@ registerSuite("list/PageableList", {
 				assertList(list, 10, 19, [], true, true, "A");
 				list.loadPreviousMessage = "foo";
 				list.deliver();
-				assert.strictEqual(removeTabsAndReturns(list.previousPageLoader.labelNode.textContent),
+				assert.strictEqual(removeTabsAndReturns(list.previousPageLoader.textContent),
 					"foo", "loader label not updated");
 			}));
 
@@ -1195,7 +1195,7 @@ registerSuite("list/PageableList", {
 				assertList(list, 10, 19, [], true, true, "A");
 				list.loadNextMessage = "foo";
 				list.deliver();
-				assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.labelNode.textContent),
+				assert.strictEqual(removeTabsAndReturns(list.nextPageLoader.textContent),
 					"foo", "loader label not updated");
 			}));
 
