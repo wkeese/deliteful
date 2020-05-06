@@ -260,9 +260,9 @@ export default register("d-pageable-list", [ List ], /** @lends module:deliteful
 		if (this.pageLength > 0) {
 			if ("_busy" in props || "hideOnPageLoad" in props || "autoPaging" in props || "showNoItems" in props
 				|| "_previousRecordsMayExist" in props || "_nextRecordsMayExist" in props) {
-				this._displayedPanel = (this._busy && this.hideOnPageLoad && !this.autoPaging) ? "loading-panel" :
-					(this.containerNode && this.containerNode.children.length > 0) ?
-						"list" : ((this.showNoItems) ? "no-items" : "none");
+				this._displayedPanel = this._busy && this.hideOnPageLoad && !this.autoPaging ? "loading-panel" :
+					this.renderItems && this.renderItems.length > 0 ?
+						"list" : this.showNoItems ? "no-items" : "none";
 			}
 		}
 
