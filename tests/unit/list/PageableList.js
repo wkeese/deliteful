@@ -943,9 +943,9 @@ registerSuite("list/PageableList", {
 
 			try {
 				list.deliver();
-				assert(list.offsetWidth > 50, "list.offsetWidth === " + list.offsetWidth);
-				assert(list.querySelector("d-list-item-renderer").offsetWidth > 0, "d-list-item-renderer");
-				assert(list.querySelector("d-list-loader[d-shown='true']").offsetWidth > 0, "d-list-loader");
+				assert.isAbove(list.offsetWidth, 50, "list offsetWidth");
+				assert.isAbove(list.querySelector(".d-list-item").offsetWidth, 0, "d-list-item offsetWidth");
+				assert.isAbove(list.querySelector(".d-list-loader").offsetWidth, 0, "d-list-loader offsetWidth");
 			} finally {
 				popup.close(list);
 			}
@@ -971,10 +971,10 @@ registerSuite("list/PageableList", {
 
 			try {
 				list.deliver();
-				assert(list.offsetWidth > 50, "list.offsetWidth === " + list.offsetWidth);
-				assert(list.querySelector("d-list-category-renderer").offsetWidth > 0, "d-list-category-renderer");
-				assert(list.querySelector("d-list-item-renderer").offsetWidth > 0, "d-list-item-renderer");
-				assert(list.querySelector("d-list-loader[d-shown='true']").offsetWidth > 0, "d-list-loader");
+				assert.isAbove(list.offsetWidth, 50, "list offsetWidth");
+				assert.isAbove(list.querySelector(".d-list-category").offsetWidth, 0, "d-list-category offsetWidth");
+				assert.isAbove(list.querySelector(".d-list-item").offsetWidth, 0, "d-list-item offsetWidth");
+				assert.isAbove(list.querySelector(".d-list-loader").offsetWidth, 0, "d-list-loader offsetWidth");
 			} finally {
 				popup.close(list);
 			}
