@@ -851,18 +851,13 @@ define(function () {
 	// Check the autoscroll mechanism
 	function checkKeyboardNavigationAutoscroll(remote, comboId) {
 		return loadFile(remote, "Combobox-decl.html")
-			.findByCssSelector("#" + comboId + " .d-combobox-arrow")
-			.click()
+			.findByCssSelector("#" + comboId + " .d-combobox-arrow").click().end()
 			.sleep(500)
 			.pressKeys(keys.END)
 			.sleep(500)
-			.execute("return " + comboId + ".list.getBottomDistance(" + comboId +
-				".list.querySelectorAll('[role=option]')[" + comboId + ".list.querySelectorAll('[role=option]').length - 1]);")
-			.then(function (value) {
-				assert.strictEqual(value, 0,
-					"After navigating to last list item, list should be at max. " +
-					"scroll on the bottom");
-			})
+			.findByCssSelector("#" + comboId + " [role=option]:last-child").isDisplayed().then(function (value) {
+				assert.isTrue(value, "last value scrolled into view");
+			}).end()
 			.execute(comboId + ".closeDropDown();");
 	}
 

@@ -986,40 +986,42 @@ export default register("d-combobox", supers, /** @lends module:deliteful/Combob
 	},
 
 	/**
-	 * Scrolls the list inside the popup such that the specified item, or
-	 * the first selected item if no item is specified, is visible.
+	 * Scrolls the list to either:
+	 *
+	 * 	1) the specified item
+	 *	2) the first selected item
+	 *  3) the first item
+	 *
+	 * If `navigate` is true, navigates to the item that it scrolls to.
+	 *
+	 * Note: Since List is in focus-less mode, it does not give focus to
+	 * navigated items, thus the browser does not autoscroll.
+	 * TODO: see deliteful #498
 	 * @private
 	 */
 	_updateScroll: function (item, navigate) {
-		// Since List is in focus-less mode, it does not give focus to
-		// navigated items, thus the browser does not autoscroll.
-		// TODO: see deliteful #498
-
 		if (!item) {
-			var selectedItems = this.list.selectedItems;
-			item = selectedItems && selectedItems.length > 0 ?
-				selectedItems[0] : null;
+			const selectedItems = this.list.selectedItems;
+			item = selectedItems && selectedItems[0];
 		}
-		if (item) {
-			// Make the first selected item (if any) visible.
-			// Must be done after sup.apply, because List.getBottomDistance
-			// relies on dimensions which are not available if the DOM nodes
-			// are not (yet) visible, hence the popup needs to be shown before.
-			var id = this.list.getIdentity(item);
-			var renderer = this.getRendererByItemId(id);
-			if (renderer) {
-				this.list.scrollBy({ y: this.list.getBottomDistance(renderer) });
-				if (navigate) {
-					this.list.navigatedDescendant = this.list.type === "grid" ?
-						renderer.firstElementChild : renderer;
-				}
-			} // null if the list is empty because no item matches the auto-filtering
-		}
+
+		const renderer = item ? this.getRendererByItemId(this.list.getIdentity(item)) : this.getFirstRenderer();
+
+		if (renderer) {
+			this.list.scrollBy({ y: this.list.getBottomDistance(renderer) });
+			if (navigate) {
+				this.list.navigateTo(this.list.type === "grid" ? renderer.firstElementChild : renderer);
+			}
+		} // null if the list is empty because no item matches the auto-filtering
 	},
 
 	getRendererByItemId: function (id) {
 		var renderers = Array.from(this.list.querySelectorAll("[role=option]"));
 		return renderers.find(renderer => this.list.getIdentity(renderer.item) === id);
+	},
+
+	getFirstRenderer: function () {
+		return this.list.querySelector("[role=option]");
 	},
 
 	// Even though the List (currently) runs the query, Combobox is in charge of converting items to renderItems.
