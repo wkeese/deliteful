@@ -689,8 +689,8 @@ export default register("d-combobox", supers, /** @lends module:deliteful/Combob
 		evt.stopPropagation();
 	},
 
-	listSelectionChangeHandler: function () {
-		this._validateInput();
+	listSelectionChangeHandler: function (evt) {
+		this._validateInput(evt);
 		this.handleOnInput(this.value); // emit "input" event
 	},
 
@@ -861,14 +861,18 @@ export default register("d-combobox", supers, /** @lends module:deliteful/Combob
 		evt.preventDefault();
 	},
 
-	_validateInput: function () {
+	_validateInput: function (evt) {
 		if (this.selectionMode === "single") {
 			this._validateSingle();
 		} else {
-			this._validateMultiple();
+			this._validateMultiple(evt);
 		}
 	},
 
+	/**
+	 * Called for single-select when the user has selected an option in the dropdown.
+	 * @private
+	 */
 	_validateSingle: function () {
 		var selectedItem = this.list.selectedItem;
 		// selectedItem non-null because List in radio selection mode, but
@@ -877,22 +881,26 @@ export default register("d-combobox", supers, /** @lends module:deliteful/Combob
 		this.value = selectedItem ? this._getItemValue(selectedItem) : "";
 	},
 
-	_validateMultiple: function () {
-		const selectedItems = this.list.selectedItems;
-		const n = selectedItems ? selectedItems.length : 0;
-
-		// Compute new value.
-		// Only set this.value if the value has changed.  Otherwise it's a spurious
-		// notification.  Stateful doesn't detect that two arrays are deep-equal because
-		// ["foo"] !== ["foo"]
-		const value = selectedItems.map(item => item ? this._getItemValue(item) : "");
-		if (!this.value || this.value.join(",") !== value.join(",")) {
-			this.value = value;
+	/**
+	 * Called for multi-select when the user has toggled an option in the dropdown.
+	 * @private
+	 */
+	_validateMultiple: function (evt) {
+		// If the list is filtered, this.list.selectedItems is a subset of all the selected items.
+		// Therefore, need to operate based on which option was toggled.
+		// Update this.value, intentionally creating a new array rather than modifying the old one.
+		const toggledValue = this._getItemValue(evt.renderer.item);
+		if (this.value.includes(toggledValue)) {
+			this.value = this.value.filter(value => value !== toggledValue);
+		} else {
+			this.value = [...this.value, toggledValue];
 		}
 
 		// Set the displayed value to represent the selection, unless filtering is enabled,
 		// in which case we need to keep it blank so the user can do more filtering.
 		if (!this.autoFilter) {
+			const selectedItems = this.list.selectedItems;
+			const n = selectedItems.length;
 			this.displayedValue = n === 0 ? this.multipleChoiceNoSelectionMsg :
 				n === 1 ? this._getItemLabel(selectedItems[0]) :
 					string.substitute(this.multipleChoiceMsg, { items: n });
@@ -900,7 +908,7 @@ export default register("d-combobox", supers, /** @lends module:deliteful/Combob
 
 		// Make sure valueNode.value is set when LitFormValueWidget.handleOnInput() runs.
 		if (this.valueNode) {
-			this.valueNode.value = value.toString();
+			this.valueNode.value = this.value.toString();
 		}
 		this.handleOnInput(this.value); // emit "input" event
 	},
@@ -961,6 +969,10 @@ export default register("d-combobox", supers, /** @lends module:deliteful/Combob
 			this.defaultQuery() : this.defaultQuery;
 	},
 
+	/**
+	 * Mark which item(s) in the dropdown list are selected.
+	 * @private
+	 */
 	_setSelectedItems: function () {
 		if (this.list && this.list.source && this.list.renderItems) {
 			var selectedItems = [],
@@ -970,9 +982,6 @@ export default register("d-combobox", supers, /** @lends module:deliteful/Combob
 			}.bind(this));
 
 			this.list.selectedItems = selectedItems;
-			if (selectedItems.length) {
-				this._validateInput();
-			}
 		}
 	},
 
