@@ -819,14 +819,18 @@ export default register("d-combobox", supers, /** @lends module:deliteful/Combob
 
 		// save what user typed at each keystroke.
 		this.displayedValue = this.focusNode.value;
-
-		// Clear value.  No value until user selects something from dropdown again.
-		this.value = this.selectionMode === "multiple" ? [] : "";
 		this._valueSetByUserInput = true;
-		if (this.list.selectedItems.length > 0) {
-			this.list.selectedItems = [];
+
+		if (this.selectionMode === "single") {
+			// Clear value.  No value until user selects something from dropdown again.
+			this.value = "";
+
+			if (this.list.selectedItems.length > 0) {
+				this.list.selectedItems = [];
+			}
+
+			this.handleOnInput(this.value); // if we just cleared this.value then emit "input" event
 		}
-		this.handleOnInput(this.value); // if we just cleared this.value then emit "input" event
 
 		if (this._timeoutHandle !== undefined) {
 			this._timeoutHandle.remove();
