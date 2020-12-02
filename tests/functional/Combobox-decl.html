@@ -891,7 +891,7 @@
 
 		getNavigatedDescendant = function (comboId) {
 			var combo = document.getElementById(comboId);
-			var activeDescendantId = combo && combo.getAttribute("aria-activedescendant");
+			var activeDescendantId = combo && combo.focusNode.getAttribute("aria-activedescendant");
 			var activeDescendant = activeDescendantId && document.getElementById(activeDescendantId);
 			return activeDescendant && activeDescendant.textContent.trim();
 		};
