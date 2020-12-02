@@ -973,7 +973,7 @@ define(function () {
 	function checkFilteringWithZeroFilterChars(remote, comboId) {
 		var executeExpr = "return getComboState(\"" + comboId + "\");";
 		return loadFile(remote, "Combobox-decl.html")
-			.findById(comboId)
+			.findByCssSelector("#" + comboId + "  .d-combobox-arrow")
 			.click() // popup opens.
 			.execute(executeExpr)
 			.then(function (comboState) {
@@ -1056,7 +1056,7 @@ define(function () {
 	function checkFilteringWithThreeFilterChars(remote, comboId) {
 		var executeExpr = "return getComboState(\"" + comboId + "\");";
 		return loadFile(remote, "Combobox-decl.html")
-			.findById(comboId)
+			.findByCssSelector("#" + comboId + "  .d-combobox-arrow")
 			.click()
 			.execute(executeExpr)
 			.then(function (comboState) {
