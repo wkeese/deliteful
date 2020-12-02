@@ -645,7 +645,12 @@ export default register("d-combobox", supers, /** @lends module:deliteful/Combob
 	focusDescendants: false,
 
 	focus: function () {
-		this.focusNode.focus();
+		const focusNode = this.focusNode;
+
+		focusNode.focus();
+
+		// Workaround IE behavior where caret gets put at beginning of text rather than end.
+		focusNode.selectionStart = focusNode.selectionEnd = focusNode.value.length;
 
 		// Set flag used in "input' handler.
 		this._justFocused = true;

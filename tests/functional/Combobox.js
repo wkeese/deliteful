@@ -1313,15 +1313,6 @@ define(function () {
 					return this.skip("no keyboard support");
 				}
 
-				if (remote.environmentType.browserName.toLowerCase() === "internet explorer") {
-					// TODO: This test fails on IE because the backspace to clear "France" doesn't work since
-					// the caret is at the beginning of the <input> rather than the end.  (Note the test is
-					// complicated because it opens the dropdown first and then does backspace.)
-					// Actually I'm not sure how the test is passing on other browsers
-					// https://github.com/ibm-js/deliteful/issues/689
-					return this.skip("caret in wrong position, backspace doesn't work");
-				}
-
 				return checkKeyboardNavigationSingleSelection(remote, "combo2", true);
 			},
 
@@ -1522,10 +1513,6 @@ define(function () {
 			"select item with currently displayed value": function () {
 				var remote = this.remote;
 
-				if (remote.environmentType.browserName.toLowerCase() === "internet explorer") {
-					// TODO: This test fails on IE because the backspace to clear "France" doesn't work.
-					return this.skip("caret in wrong position, backspace doesn't work");
-				}
 				if (remote.environmentType.brokenSendKeys || !remote.environmentType.nativeEvents) {
 					return this.skip("no keyboard support");
 				}
